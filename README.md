@@ -28,3 +28,10 @@ for Debian based distros
 
 ### How to Use Neutron:
 
+From terminal type-in ``neutron`` for usage:
+
+<img src="images/Screenshot_20200205_013219-min.jpg" />
+
+type-in ``neutron start`` to start anonynizing
+
+<img src="images/Screenshot_20200205_013610-min.jpg" />
