@@ -12,11 +12,11 @@
 
 ``cd Neutron``
 
-for Arch based distros
+**for Arch based distros**
  
 ``cd Neutron-A`` 
 
-for Debian based distros
+**for Debian based distros**
 
 ``cd Neutron-D``
  
@@ -28,10 +28,34 @@ for Debian based distros
 
 ### How to Use Neutron:
 
-From terminal type-in ``neutron`` for usage:
+***e.g.*** everything after ``neutron`` is non case sensitive(example: ``neutron StArT ``)
 
-<img src="images/Screenshot_20200205_013219-min.jpg" />
+**From terminal type-in ``neutron`` for usage:**
 
-type-in ``neutron start`` to start anonynizing
+<img src="images/Screenshot_20200205_201040-min.jpg" />
+
+***type-in ``neutron start`` to start anonynizing***
 
 <img src="images/Screenshot_20200205_013610-min.jpg" />
+
+**to stop the process, type-in**
+
+``neutron stop``
+***if you've instances of running neutron before only then it'll execute otherwise not**
+
+<img src="images/Screenshot_20200205_202652-min.jpg" />
+
+<img src="images/Screenshot_20200205_200808-min.jpg" />
+
+
+**Now, to change your ip aka hop to a different tor exit Node, type-in**
+
+``neutron shuffle``
+
+<img src="images/Screenshot_20200205_211408-min.jpg" />
+
+**Now, to check if you're using tor type-in
+```bash
+neutron check
+```
+<img src="images/Screenshot_20200205_201317-min.jpg" />
