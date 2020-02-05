@@ -67,3 +67,9 @@ neutron myip
 ```
 <img src="images/Screenshot_20200205_201615-min.jpg" />
 
+
+### Somethin Personal
+
+I've been planning to finish this project for a while now but my other head has some different plans so it took some time. but It's here so good for me.
+As I'm no stranger to self-loathing or what kids call Heartache these days; I've included some Quotes that I like and some of my own(seriously not bragging); I hope this might help when you start Neutron.
+
