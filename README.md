@@ -24,7 +24,7 @@ for Debian based distros
  
 ``chmod +x installer.sh``
 
-``./installer.sh``
+``sudo ./installer.sh``
 
 ### How to Use Neutron:
 
