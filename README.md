@@ -28,7 +28,7 @@
 
 ### How to Use Neutron:
 
-***e.g.*** everything after ``neutron`` is non case sensitive(example: ``neutron StArT ``)
+***e.g.*** everything after ``neutron`` is non case sensitive(example: ``neutron StArT`` and every other possible combinations are good to go.)
 
 **From terminal type-in ``neutron`` for usage:**
 
@@ -54,8 +54,16 @@
 
 <img src="images/Screenshot_20200205_211408-min.jpg" />
 
-**Now, to check if you're using tor type-in
+**Now, to check if you're using tor type-in**
 ```bash
 neutron check
 ```
+
 <img src="images/Screenshot_20200205_201317-min.jpg" />
+
+***to, check your ip type-in**
+```bash
+neutron myip
+```
+<img src="images/Screenshot_20200205_201615-min.jpg" />
+
