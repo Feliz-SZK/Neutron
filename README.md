@@ -41,14 +41,14 @@
 **to stop the process, type-in**
 
 ``neutron stop``
-***if you've instances of running neutron before only then it'll execute otherwise not**
+***if your system hs instances of neutron running; only then it'll execute otherwise not***
 
 <img src="images/Screenshot_20200205_202652-min.jpg" />
 
 <img src="images/Screenshot_20200205_200808-min.jpg" />
 
 
-**Now, to change your ip aka hop to a different tor exit Node, type-in**
+**Now, to change your ip aka to hop on a different tor exit Node, type-in**
 
 ``neutron shuffle``
 
