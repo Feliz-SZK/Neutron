@@ -225,7 +225,7 @@ sudo pacman -S tor''')
     if returnNotMatches(resolvstring, lines)!=set([]):
         print(green + fc.BOLD + "Configuring Resolv.config" + fc.ENDC)
         time.sleep(0.5)
-        MyFile=open('/etc/resolv.conf','a')
+        MyFile=open('/etc/resolv.conf','w')
         for element in returnNotMatches(resolvstring,lines):
             MyFile.write("%s\n" % element)
         MyFile.close()
