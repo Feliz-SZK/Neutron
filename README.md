@@ -4,6 +4,8 @@
 
 **All you gotta do is clone the repo and get into the directory depending on your distro and run the installer**
 
+**The special features about neutron is it's faster, visually inspiring and it deals with configs as delicately as possible.**
+
 ## How to install Neutron:
 
 ``git clone https://github.com/Feliz-SZK/Neutron.git``
