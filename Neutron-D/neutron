@@ -451,6 +451,7 @@ elif sys.argv[1].casefold() in 'myip':
     logo()
     print('\n' + green +  'your ip is: ' + fc.ENDC + color + ip() + fc.ENDC)
 elif sys.argv[1].casefold() in 'shuffle':
+    sudo()
     logo()
     torcircuit()
 elif  sys.argv[1].casefold() in 'check':
