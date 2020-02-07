@@ -370,7 +370,7 @@ def firewall():
 	iptables -t nat -A OUTPUT -p tcp --dport 53 -j REDIRECT --to-ports 5353
 	iptables -t nat -A OUTPUT -p udp -m owner --uid-owner tor -m udp --dport 53 -j REDIRECT --to-ports 5353
 	
-	#resolve .onion domains mapping 10.192.0.0/10 address space
+	#resolve .onion domains mapping 10.192.0.0/10 address space to access hidden services
 	iptables -t nat -A OUTPUT -p tcp -d 10.192.0.0/10 -j REDIRECT --to-ports 9040
 	iptables -t nat -A OUTPUT -p udp -d 10.192.0.0/10 -j REDIRECT --to-ports 9040
 	
@@ -379,7 +379,7 @@ def firewall():
 		iptables -t nat -A OUTPUT -d $NET -j RETURN
 	done
 	
-	#redirect all other output through TOR
+	#redirect all other output through TOR transport
 	iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports $trans_port
 	iptables -t nat -A OUTPUT -p udp -j REDIRECT --to-ports $trans_port
 	iptables -t nat -A OUTPUT -p icmp -j REDIRECT --to-ports $trans_port
