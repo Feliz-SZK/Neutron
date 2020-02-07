@@ -74,3 +74,11 @@ neutron myip
 >>I've been planning to finish this project for a while now but my other head has some different plans so it took some time. but It's here so good for me.
 As I'm no stranger to self-loathing or what kids call Heartache these days; I've included some Quotes that I like and some of my own; I hope this might help when you start Neutron to revolutionize the world or just to look cool. Cause no matter what it's just a matter of seconds to bring the best in you.
 
+
+----
+## License & copyright
+ 
+© Salim Zaved Karim
+ 
+Licensed under the [MIT License](https://github.com/Feliz-SZK/Neutron/blob/master/LICENSE).
+
