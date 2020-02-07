@@ -74,6 +74,14 @@ As I'm no stranger to self-loathing or what kids call Heartache these days; I've
 
 
 ----
+
+## Precautions
+
+* Do not run tor browser while running neutron
+
+**Cause you'll think you get 6 hops; but the thing is the extra 3 hops may not be different they could be the same or in mixed order(this said to be vulnarable as the routing order is not over tor anymore), so accessing tor browser while running tor as a transparent proxy is highly discouraged.**
+
+
 ## License & copyright
  
 © Salim Zaved Karim
@@ -81,11 +89,11 @@ As I'm no stranger to self-loathing or what kids call Heartache these days; I've
 Licensed under the [MIT License](https://github.com/Feliz-SZK/Neutron/blob/master/LICENSE).
 
 
-## Precautions
 
-* Do not run tor browser while running neutron
 
-**Cause you'll think you get 6 hops; but the thing is the extra 3 hops may not be different they could be the same or in mixed order(this said to be vulnarable as the routing order is not over tor anymore), so accessing tor browser while running tor as a transparent proxy is highly discouraged.**
+## Credits for the nuke Asci art work:
+https://boxes.thomasjensen.com/
+
 
 
 
