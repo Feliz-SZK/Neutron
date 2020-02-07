@@ -2,8 +2,6 @@
 
 **Neutron anonymizes the entire system traffic using tor as a transparent proxy(Even the Dns).**
 
-**As it uses the new Dns Port ``5353`` it's quite faster over port ``53``**
-
 **All you gotta do is clone the repo and get into the directory depending on your distro and run the installer**
 
 ## How to install Neutron:
@@ -81,4 +79,14 @@ As I'm no stranger to self-loathing or what kids call Heartache these days; I've
 © Salim Zaved Karim
  
 Licensed under the [MIT License](https://github.com/Feliz-SZK/Neutron/blob/master/LICENSE).
+
+
+## Precautions
+
+* Do not run tor browser while running neutron
+
+**Cause you'll think you get 6 hops; but the thing is the extra 3 hops may not be different they could be the same or in mixed order(this said to be vulnarable as the routing order is not over tor anymore), so accessing tor browser while running tor as a transparent proxy is highly discouraged.**
+
+
+
 
