@@ -2,9 +2,10 @@
 
 **Neutron anonymizes the entire system traffic using tor as a transparent proxy(Even the Dns).**
 
+**The special features about neutron is it's faster, visually inspiring and it deals with configs as delicately as possible.**
+
 **All you gotta do is clone the repo and get into the directory depending on your distro and run the installer**
 
-**The special features about neutron is it's faster, visually inspiring and it deals with configs as delicately as possible.**
 
 ## How to install Neutron:
 
