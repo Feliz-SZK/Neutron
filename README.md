@@ -89,7 +89,7 @@ As I'm no stranger to self-loathing or what kids call Heartache these days; I've
  
 © Salim Zaved Karim
  
-Licensed under the [MIT License](https://github.com/Feliz-SZK/Neutron/blob/master/LICENSE).
+Licensed under the [GPL-V3.0 License](https://github.com/Feliz-SZK/Neutron/blob/master/LICENSE).
 
 
 
