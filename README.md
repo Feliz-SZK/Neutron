@@ -65,7 +65,7 @@ neutron check
 
 <img src="images/Screenshot_20200205_201317-min.jpg" />
 
-***to, check your ip type-in**
+**to, check your ip type-in**
 ```bash
 neutron myip
 ```
