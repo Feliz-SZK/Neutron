@@ -53,6 +53,9 @@
 
 ``neutron shuffle``
 
+Again, it only works if neutron had executed before;
+
+
 <img src="images/Screenshot_20200205_211408-min.jpg" />
 
 **Now, to check if you're using tor type-in**
