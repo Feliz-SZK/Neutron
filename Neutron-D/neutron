@@ -89,9 +89,12 @@ def ip():
 			return ip1
 		except requests.exceptions.RequestException as e:
 			print(f'\n{e}')
-			print(
-				f"\nEither the internet's down or you've multiple configs at /etc/tor/torrc")
-			sys.exit()
+			sys.exit(color() + """\nSorry, can't fetch the deets.
+Either the site's down or something's up with your internet-config.
+
+you may found the solution here :)
+https://github.com/Feliz-SZK/Linux-Decoded/blob/master/Fix%20temporary%20failure%20in%20name%20resolution.md""" + fc.ENDC)
+
 
 	return ip_
 
@@ -307,11 +310,11 @@ def torcircuit():
 def tor_stat(e_backoff):
 
 	if e_backoff > 0:
-		sys.exit(color() + """\nSorry, Can't fetch the deets.
+		sys.exit(color() + """\nSorry, can't fetch the deets.
 Either the site's down or something's wrong with your internet config.
 
-you may found the solution here: 
-'https://github.com/Feliz-SZK/Linux-Decoded/blob/master/Fix%20temporary%20failure%20in%20name%20resolution.md'""" + fc.ENDC)
+you may found the solution here :)
+https://github.com/Feliz-SZK/Linux-Decoded/blob/master/Fix%20temporary%20failure%20in%20name%20resolution.md""" + fc.ENDC)
 
 	ip = r'''
 deets=$(curl https://check.torproject.org -s -k); echo $deets | grep -o "<title>[^<]*" | tail -c+8; echo $deets |& grep -Po "(?<=strong>)[\d\.]+(?=</strong)" 
