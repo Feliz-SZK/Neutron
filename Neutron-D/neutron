@@ -304,7 +304,14 @@ def torcircuit():
 			  fc.ENDC + color() + fc.BOLD + str(ip()) + fc.ENDC)
 
 
-def tor_stat():
+def tor_stat(e_backoff):
+
+	if e_backoff > 0:
+		sys.exit(color() + """\nSorry, Can't fetch the deets.
+Either the site's down or something's wrong with your internet config.
+
+you may found the solution here: 
+'https://github.com/Feliz-SZK/Linux-Decoded/blob/master/Fix%20temporary%20failure%20in%20name%20resolution.md'""" + fc.ENDC)
 
 	ip = r'''
 deets=$(curl https://check.torproject.org -s -k); echo $deets | grep -o "<title>[^<]*" | tail -c+8; echo $deets |& grep -Po "(?<=strong>)[\d\.]+(?=</strong)" 
@@ -313,11 +320,10 @@ deets=$(curl https://check.torproject.org -s -k); echo $deets | grep -o "<title>
 		'/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	out1, err1 = process1.communicate(ip.encode('utf-8'))
 	if len(out1.decode('utf8')) == 0:
-		print(color() + """\nSorry, Can't fetch the deets.
-Either the internet's down or something's wrong with your internet config.
-
-you may found the solution here- 
-'https://github.com/Feliz-SZK/Linux-Decoded/blob/master/Fix%20temporary%20failure%20in%20name%20resolution.md'""" + fc.ENDC)
+		e_backoff += 1
+		print(f"{color()}\nhaving trouble fetching exit-node details, retrying....{fc.ENDC}")
+		time.sleep(1)
+		return tor_stat(e_backoff)
 	else:
 		deet = out1.decode("utf-8").strip().split('\n')
 		print("\nYour Ip address is: " + color() + fc.BOLD + deet[1] + fc.ENDC)
@@ -417,7 +423,7 @@ elif sys.argv[1].casefold() == 'start'.casefold():
 	logo()
 	configure()
 	firewall()
-	tor_stat()
+	tor_stat(0)
 elif sys.argv[1].casefold() == 'stop'.casefold():
 	sudo()
 	logo()
@@ -431,7 +437,7 @@ elif sys.argv[1].casefold() == 'shuffle'.casefold():
 	torcircuit()
 elif sys.argv[1].casefold() == 'check'.casefold():
 	logo()
-	tor_stat()
+	tor_stat(0)
 else:
 	print(
 		f"{color(lightgreen)} {sys.argv[1]}! {color(lightblue)}ain't a valid trigger. {fc.ENDC}")
