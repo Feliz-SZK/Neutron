@@ -1,10 +1,10 @@
-## Neutron, a powerful and smart traffic anonymizer.
+## Neutron, a powerful and stealthy traffic anonymizer.
 
-**Neutron anonymizes the entire system traffic using tor as a transparent proxy(Even the Dns).**
+Neutron anonymizes the entire system traffic using tor as a transparent proxy(even the Dns). Written in python3, neutron works seamlessly in both Debian and Arch based distros.
 
-**The special features about neutron is it's faster, visually inspiring and it deals with configs as delicately as possible.**
+The good thing about neutron is it's stealthy, visually inspiring, and it deals with configs as delicately as possible.
 
-**All you gotta do is clone the repo and get into the directory depending on your distro and run the installer**
+All you gotta do is clone the repo and run the installer.
 
 
 ## How to install Neutron:
@@ -15,11 +15,11 @@
 
 **for Arch based distros**
  
-``cd Neutron-A`` 
+``cd neutron-arch`` 
 
 **for Debian based distros**
 
-``cd Neutron-D``
+``cd neutron-debian``
  
  Finally:
  
@@ -27,65 +27,54 @@
 
 ``sudo ./installer.sh``
 
-### How to Use Neutron:
+### Using Neutron:
 
-***e.g.*** everything after ``neutron`` is non case sensitive(example: ``neutron StArT`` and every other possible combinations are good to go.)
+From terminal type-in ``neutron`` for usage:
 
-**From terminal type-in ``neutron`` for usage:**
+<img src="images/neutron_usage.png" />
 
-<img src="images/Screenshot_20200205_201040-min.jpg" />
+To start anonymizing, type-in ``neutron start``
 
-***type-in ``neutron start`` to start anonynizing***
+<img src="images/neutron_engine.png" />
 
-<img src="images/Screenshot_20200205_013610-min.jpg" />
-
-**to stop the process, type-in**
+to **stop** neutron and get back to surface-web do,
 
 ``neutron stop``
-***if your system hs instances of neutron running; only then it'll execute otherwise not***
 
-<img src="images/Screenshot_20200205_202652-min.jpg" />
+It'll work only if neutron is running or was executed.
 
-<img src="images/Screenshot_20200205_200808-min.jpg" />
+<img src="images/neutron_stop.png" />
 
 
-**Now, to change your ip aka to hop on a different tor exit Node, type-in**
+Now, to change your Ip or to hop on a different tor exit-node,
 
 ``neutron shuffle``
 
 Again, it only works if neutron had executed before;
 
-
-<img src="images/Screenshot_20200205_211408-min.jpg" />
-
-**Now, to check if you're using tor type-in**
+Now, to check if you're using tor do,
 ```bash
 neutron check
 ```
 
-<img src="images/Screenshot_20200205_201317-min.jpg" />
-
-**to, check your ip type-in**
+Just to check your ip type-in,
 ```bash
 neutron myip
 ```
-<img src="images/Screenshot_20200205_201615-min.jpg" />
 
 
 ----
 ### Somethin Personal
 
->>I've been planning to finish this project for a while now but my other head has some different plans so it took some time. but It's here so good for me.
-As I'm no stranger to self-loathing or what kids call Heartache these days; I've included some Quotes that I like and some of my own; I hope this might help when you start Neutron to revolutionize the world or just to look cool. Cause no matter what it's just a matter of seconds to bring the best in you.
-
-
+>>I wrote this back in college, it's when I realized writing code ain't that bad, you just gotta have a sense of purpose. 
+Talking about life and whatnots, I ain't no stranger to self-loathing or what kids call Heartache these days; I've added these Quotes I like and some of my own. They're kind of childish but I hope it brings a smile to your face; till then take care and don't be another brick in the wall.
 ----
 
 ## Precautions
 
-* Do not run tor browser while running neutron
+* Do not use tor browser while running neutron
 
-**Cause you'll think you get 6 hops; but the thing is the extra 3 hops may not be different they could be the same or in mixed order(this said to be vulnarable as the routing order is not over tor anymore), so accessing tor browser while running tor as a transparent proxy is highly discouraged.**
+**You may think you get 6 hops; but the thing is the extra 3 hops may not be different they could be the same or in mixed order(this said to be vulnarable as the routing order is not over tor anymore), so using tor-browser while running tor as a transparent proxy is highly discouraged.**
 
 
 ## License & copyright
