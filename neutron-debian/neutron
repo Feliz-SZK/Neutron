@@ -207,16 +207,14 @@ def configure():
 			with open('/etc/tor/torrc') as x:
 				verse = x.read().splitlines()
 
-			if returnNotMatches(verse, torrstring):
-				subprocess.Popen(["cp", "/etc/tor/torrc", "/etc/tor/torrc.bak_neutron"], stdout=subprocess.PIPE).communicate()
-				torrc = open('/etc/tor/torrc', 'w')
-				for elements in torrstring:
-					torrc.write("%s\n" % elements)
-				torrc.close()
-				print(f"{color(lightred)}DONE :){fc.ENDC}")
-			else:
-				print(color() + fc.BOLD + " :) Already Configured" + fc.ENDC)
-				time.sleep(0.4)
+
+			subprocess.Popen(["cp", "/etc/tor/torrc", "/etc/tor/torrc.bak_neutron"], stdout=subprocess.PIPE).communicate()
+			torrc = open('/etc/tor/torrc', 'w')
+			for elements in torrstring:
+				torrc.write("%s\n" % elements)
+			torrc.close()
+			print(f"{color(lightred)}DONE :){fc.ENDC}")
+
 
 	else:
 		print(f'''\n{color(red)}tor isn't installed, install it with
@@ -285,11 +283,11 @@ else your system has some serious paranoia(deleting backups itself)''' + fc.ENDC
 			print(color() + '\n' + err1.decode('utf8').strip() + fc.ENDC)
 			print(color() + "Can't restore Iptables")
 		time.sleep(0.5)
-		print(color() + fc.BOLD + 'Cleaning up complete :)' + fc.ENDC)
-	else:
-		print('\n' + red + fc.BOLD + "No instances of Neutron has been executed")
-		print(green + fc.BOLD + '[Exiting...]' + fc.ENDC)
-		sys.exit()
+		sys.exit(color() + fc.BOLD + 'Cleaning up complete :)' + fc.ENDC)
+
+	print('\n' + red + fc.BOLD + "No instances of Neutron has been executed")
+	print(green + fc.BOLD + '[Exiting...]' + fc.ENDC)
+	sys.exit()
 
 
 def torcircuit():

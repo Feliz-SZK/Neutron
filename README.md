@@ -33,11 +33,11 @@ From terminal type-in ``neutron`` for usage:
 
 <img src="images/neutron_usage.png" />
 
-To start anonymizing, type-in ``neutron start``
+**To start anonymizing, type-in ``neutron start``**
 
 <img src="images/neutron_engine.png" />
 
-to **stop** neutron and get back to surface-web do,
+**to ``stop`` neutron and get back to surface-web do,**
 
 ``neutron stop``
 
@@ -46,18 +46,18 @@ It'll work only if neutron is running or was executed.
 <img src="images/neutron_stop.png" />
 
 
-Now, to change your Ip or to hop on a different tor exit-node,
+**Now, to change your Ip or to hop on a different tor exit-node,**
 
 ``neutron shuffle``
 
 Again, it only works if neutron had executed before;
 
-Now, to check if you're using tor do,
+**Now, to check if you're using tor do,**
 ```bash
 neutron check
 ```
 
-Just to check your ip type-in,
+**Just to check your ip type-in,**
 ```bash
 neutron myip
 ```
@@ -66,8 +66,8 @@ neutron myip
 ----
 ### Somethin Personal
 
->>I wrote this back in college, it's when I realized writing code ain't that bad, you just gotta have a sense of purpose. 
-Talking about life and whatnots, I ain't no stranger to self-loathing or what kids call Heartache these days; I've added these Quotes I like and some of my own. They're kind of childish but I hope it brings a smile to your face; till then take care and don't be another brick in the wall.
+>>I wrote this back in college, it's when I realized writing code ain't that bad; you just gotta have a sense of purpose, you know.
+Talking about purpose and whatnots, I ain't no stranger to self-loathing or what kids call Heartache these days; I've added these Quotes I like and some of my own. They're kind of childish but I hope it brings a smile to your face; till then take care and don't be another brick in the wall :)
 ----
 
 ## Precautions
@@ -75,6 +75,12 @@ Talking about life and whatnots, I ain't no stranger to self-loathing or what ki
 * Do not use tor browser while running neutron
 
 **You may think you get 6 hops; but the thing is the extra 3 hops may not be different they could be the same or in mixed order(this said to be vulnarable as the routing order is not over tor anymore), so using tor-browser while running tor as a transparent proxy is highly discouraged.**
+
+* Neutron can keep your identity in grey but can't protect if your system is compromised.
+
+**If there's a backdoor or a rootkit in your system; nay an regular program if running with superuser privilages, it could read your hardware deets(serial no, firmware version, Mac address), host name, could discover other devices in your network, get their details even exploit them. Keep in mind, Neutron can't protect you in such scenarios. Using tails or similar OS could isolate you completely unless someone come up with an Zero Day.**
+
+**Also, doesn't matter if you're running Neutron in your VM or host OS, please consider changing the host-name and MAC address.**
 
 
 ## License & copyright
