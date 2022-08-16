@@ -227,7 +227,9 @@ def configure():
 
 def terminate():
 
+    trigger = 0
     if os.path.exists('/etc/resolv.conf.backup_neutron'):
+        trigger += 1
         restore = "yes | mv /etc/resolv.conf.backup_neutron /etc/resolv.conf"
         process = subprocess.Popen('/bin/bash', stdin=subprocess.PIPE,
                                    stdout=open(os.devnull, 'wb'), stderr=subprocess.PIPE)
@@ -244,6 +246,7 @@ else your system has some serious paranoia(deleting backups itself)''' + fc.ENDC
         print(f"{cyan}{fc.BOLD}[Complete]{fc.ENDC}")
     
     if os.path.exists('/etc/tor/torrc.bak_neutron'):
+        trigger += 1
         torrc_restore = "mv /etc/tor/torrc.bak_neutron /etc/tor/torrc"
         process = subprocess.Popen('/bin/bash', stdin=subprocess.PIPE,
                                    stdout=open(os.devnull, 'wb'), stderr=subprocess.PIPE)
@@ -259,6 +262,7 @@ else your system has some serious paranoia(deleting backups itself)''' + fc.ENDC
         time.sleep(0.5)
         print(f"{cyan}{fc.BOLD}[Done]{fc.ENDC}")
     if "neutron" in frag():
+        trigger += 1
         restore_iptables = '''
         iptables -P INPUT ACCEPT
         iptables -P FORWARD ACCEPT
@@ -281,11 +285,12 @@ else your system has some serious paranoia(deleting backups itself)''' + fc.ENDC
             print(color() + '\n' + err1.decode('utf8').strip() + fc.ENDC)
             print(color() + "Can't restore Iptables")
         time.sleep(0.5)
-        sys.exit(color() + fc.BOLD + 'Cleaning up complete :)' + fc.ENDC)
 
-    print('\n' + red + fc.BOLD + "No instances of Neutron has been executed")
-    print(green + fc.BOLD + '[Exiting...]' + fc.ENDC)
-    sys.exit()
+    if trigger == 0:
+        print('\n' + red + fc.BOLD + "No instances of Neutron has been executed")
+        print(green + fc.BOLD + '[Exiting...]' + fc.ENDC)
+        sys.exit()
+    else: print(color() + fc.BOLD + 'Cleaning up complete :)' + fc.ENDC)
 
 
 def torcircuit():
@@ -313,7 +318,7 @@ you may found the solution here :)
 https://github.com/Feliz-SZK/Linux-Decoded/blob/master/Fix%20temporary%20failure%20in%20name%20resolution.md""" + fc.ENDC)
 
     ip = r'''
-deets=$(curl https://check.torproject.org -s -k); echo $deets | grep -o "<title>[^<]*" | tail -c+8; echo $deets |& grep -Po "(?<=strong>)[\d\.]+(?=</strong)" 
+deets=$(curl https://check.torproject.org -s -k); echo $deets | grep -o "<title>[^<]*" | tail -c+8; echo $deets | grep -o -m1 "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}" 
 '''
     process1 = subprocess.Popen(
         '/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
