@@ -384,13 +384,13 @@ def firewall():
                                 stdout=open(os.devnull, 'wb'), stderr=subprocess.PIPE)
     out5, err5 = process5.communicate(inn_out_rules.encode('utf-8'))
 
-    if out5:
-        pass
+
     if err5:
         print('\n' + color() + err5.decode('utf8').strip() + fc.ENDC)
         print("""There's something strange with your system
 It doesn't let me change the iptable rules""")
         sys.exit()
+    time.sleep(1)
 
 
 def usage():
