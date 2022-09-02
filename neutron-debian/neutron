@@ -7,6 +7,7 @@ from signal import signal, SIGINT
 import random
 import requests
 import subprocess
+import re
 
 red = '\033[31m'
 green = '\033[32m'
@@ -312,29 +313,22 @@ def torcircuit():
 
 def tor_stat(e_backoff):
 
-	if e_backoff > 0:
-		sys.exit(color() + """\nSorry, can't fetch the deets.
-Either the site's down or something's wrong with your internet config.
-
-you may found the solution here :)
-https://github.com/Feliz-SZK/Linux-Decoded/blob/master/Fix%20temporary%20failure%20in%20name%20resolution.md""" + fc.ENDC)
-
-	ip = r'''
-deets=$(curl https://check.torproject.org -s -k); echo $deets | grep -o "<title>[^<]*" | tail -c+8; echo $deets | grep -o -m1 "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}" 
-'''
-	process1 = subprocess.Popen(
-		'/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	out1, err1 = process1.communicate(ip.encode('utf-8'))
-	if len(out1.decode('utf8')) == 0:
+	try:
+		resp = requests.get("https://check.torproject.org")
+	except Exception as e:
 		e_backoff += 1
+		if e_backoff > 1:
+			sys.exit(color() + f"""\nUnable to get the network-details.
+if this persists, please raise an issue in github.\n\n{color(red)}{e}""" + fc.ENDC)
 		print(f"{color()}\nhaving trouble fetching exit-node details, retrying....{fc.ENDC}")
 		time.sleep(1)
 		return tor_stat(e_backoff)
-	else:
-		deet = out1.decode("utf-8").strip().split('\n')
-		print("\nYour Ip address is: " + color() + fc.BOLD + deet[1] + fc.ENDC)
-		print(f"{color()}Congratulations, you're using tor :){fc.ENDC}") if "Congratulations" in deet[0].strip(
-		) else print(f"{color()}{deet[0].strip()}{fc.ENDC}")
+
+	status = re.search(r'<title[^>]*>([^<]+)</title>', resp.text).group(1)
+	ip = re.search( r'[0-9]+(?:\.[0-9]+){3}', resp.text ).group(0)
+		
+	print("\nYour Ip address is: " + color() + fc.BOLD + ip + fc.ENDC)
+	print(f"{color()}Congratulations, you're using tor :){fc.ENDC}") if "Congratulations" in status.strip() else print(f"{color()}{status.strip()}{fc.ENDC}")
 	return 0
 
 
