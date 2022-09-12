@@ -27,47 +27,30 @@ All you gotta do is clone the repo and run the installer.
 
 ``sudo ./installer.sh``
 
-### Using Neutron:
+### Usage:
 
-From terminal type-in ``neutron`` for usage:
-
-<img src="images/neutron_usage.png" />
-
-**To start anonymizing, type-in ``neutron start``**
-
-<img src="images/neutron_engine.png" />
-
-**to ``stop`` neutron and get back to surface-web do,**
-
-``neutron stop``
-
-It'll work only if neutron is running or was executed.
-
-<img src="images/neutron_stop.png" />
-
-
-**Now, to change your Ip or to hop on a different tor exit-node,**
-
-``neutron shuffle``
-
-Again, it only works if neutron had executed before;
-
-**Now, to check if you're using tor do,**
-```bash
-neutron check
+```ascii
+ -h, --help               show this help message and exit         
+ -m, --mask               start anonymizing                       
+ -e, --expose             get back to surface-web                 
+ -i, --ip                 check current IP address                
+ -s, --shuffle            connect to a different exit-node        
+ -w, --whatami            check if using tor                      
+ -n, --nuke               backs up and reset Iptables to default. 
 ```
+**anonymizing,**
 
-**Just to check your ip type-in,**
-```bash
-neutron myip
-```
+<img src="images/neutron_m.png" />
 
+**Returning to surface-web,**
+
+<img src="images/neutron_e.png" />
 
 ----
 ### Somethin Personal
 
 >>I wrote this back in college, it's when I realized writing code ain't that bad; you just gotta have a sense of purpose, you know.
-Talking about purpose and whatnots, I ain't no stranger to self-loathing or what kids call Heartache these days; I've added these Quotes I like and some of my own. They're kind of childish but I hope it brings a smile to your face; till then take care and don't be another brick in the wall :)
+Talking about purpose and whatnots, I ain't no stranger to self-loathing or what kids call Heartache these days. I've added these Quotes I like and some of my own. They're kind of childish but I hope it brings a smile to your face; till then take care and don't be another brick in the wall :)
 ----
 
 ## Precautions
@@ -92,8 +75,13 @@ Licensed under the [GPL-V3.0 License](https://github.com/Feliz-SZK/Neutron/blob/
 
 
 
-### Credits for the nuke Asci art work:
-https://boxes.thomasjensen.com/
+### Credits and References:
+
+Nuke Asci art work: https://boxes.thomasjensen.com
+
+Firewall Rules: [The tor project documentation.](https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxy)
+
+---
 
 
 

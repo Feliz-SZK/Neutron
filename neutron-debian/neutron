@@ -107,7 +107,7 @@ def returnNotMatches(a, b):
 
 
 def frag():
-	fragment = subprocess.Popen("iptables -t nat -L -n | grep 5353", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+	fragment = subprocess.Popen("iptables -t nat -L -n", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
 	frag, defrag = fragment
 	if defrag: print(f"\n{red}encounterd some hiccups while checking the iptables-deets{fc.ENDC}")
 	return frag.decode("utf-8")
@@ -141,7 +141,7 @@ def finesse(backoff, resolv_switch):
 
 
 torrstring = ["VirtualAddrNetworkIPv4 10.192.0.0/10", 'AutomapHostsOnResolve 1',
-			  'TransPort 9040', 'DNSPort 5353', 'CookieAuthentication 1', 'ControlPort 9051']
+			  'TransPort 9040 IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDestPort', 'DNSPort 5353', 'CookieAuthentication 1']
 
 
 resolvstring = 'nameserver 127.0.0.1'
@@ -241,9 +241,8 @@ def terminate():
 
 		if err:
 			print('\n' + err.decode('utf8').replace("\n", '\n'))
-			print(" ")
-			print(red + r'''I guess you're playing around,
-else your system has some serious paranoia(deleting backups itself)''' + fc.ENDC)
+			print(red + r'''\nI guess you're playing around,
+else your system has some serious paranoia; deleting backups itself.''' + fc.ENDC)
 			sys.exit()
 		time.sleep(0.5)
 		print(f"{cyan}{fc.BOLD}[Complete]{fc.ENDC}")
@@ -266,28 +265,18 @@ else your system has some serious paranoia(deleting backups itself)''' + fc.ENDC
 		print(f"{cyan}{fc.BOLD}[Done]{fc.ENDC}")
 	if "neutron" in frag():
 		trigger += 1
-		restore_iptables = '''
-		iptables -P INPUT ACCEPT
-		iptables -P FORWARD ACCEPT
-		iptables -P OUTPUT ACCEPT
-		iptables -t nat -F
-		iptables -t nat -X
-		iptables -t mangle -F
-		iptables -t mangle -X
-		iptables -F
-		iptables -X
-		service tor stop
-		'''
 		print(green + fc.BOLD + 'Restoring Iptables rules' + fc.ENDC)
-		process1 = subprocess.Popen(
-			'/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		out1, err1 = process1.communicate(restore_iptables.encode('utf-8'))
-
-		time.sleep(0.5)
-		if err1:
-			print(color() + '\n' + err1.decode('utf8').strip() + fc.ENDC)
-			print(color() + "Can't restore Iptables")
-		time.sleep(0.5)
+		if os.path.exists("/etc/iptables_rules_neutron.bak"):
+			one, zero = subprocess.Popen('iptables-restore < /etc/iptables_rules_neutron.bak', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+			os.remove('/etc/iptables_rules_neutron.bak')
+			if zero and b"Warning" not in zero:
+				print(f"{red} can't restore previous rules, seems the file's being tampered with\n{lightred} {zero.decode('utf-8').strip()}{fc.ENDC}")
+				print(f"{green}{fc.BOLD}Defaulting..{fc.ENDC}")
+				reset_to_default(0,1)
+		else:
+			print(f"{color()} It seems the Iptables backup is deleted, defaulting..{fc.ENDC}") 
+			reset_to_default(0,1)
+		time.sleep(1)
 
 	if trigger == 0:
 		print('\n' + red + fc.BOLD + "No instances of Neutron has been executed")
@@ -317,11 +306,11 @@ def tor_stat(e_backoff):
 		resp = requests.get("https://check.torproject.org")
 	except Exception as e:
 		e_backoff += 1
-		if e_backoff > 1:
-			sys.exit(color() + f"""\nUnable to get the network-details.
-if this persists, please raise an issue in github.\n\n{color(red)}{e}""" + fc.ENDC)
-		print(f"{color()}\nhaving trouble fetching exit-node details, retrying....{fc.ENDC}")
-		time.sleep(1)
+		if e_backoff > 2:
+			sys.exit(color() + f"""\nUnable to get the network-details, try with -w once.
+if this persists, please raise an issue on github.\n\n{color(red)}{e}""" + fc.ENDC)
+		print(f"{color(lightgreen)}\nhaving trouble fetching exit-node details, {color(cyan)}retrying....{e_backoff}{fc.ENDC}")
+		time.sleep(1.2)
 		return tor_stat(e_backoff)
 
 	status = re.search(r'<title[^>]*>([^<]+)</title>', resp.text).group(1)
@@ -334,48 +323,113 @@ if this persists, please raise an issue in github.\n\n{color(red)}{e}""" + fc.EN
 
 def firewall():
 
+	print(f"{green}Backing up Iptables..{fc.ENDC}")
+	proc = subprocess.Popen('iptables-save > /etc/iptables_rules_neutron.bak', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+	outp, error = proc.communicate()
+	if error and b'Warning:' not in error: 
+		print(f"{red}\nCan't seem to save the iptables_bakup file in /etc.\n{error.decode('utf-8')}")
+		sys.exit()
+	print(f"{lightred}Done :) {blue}location: {red}/etc/iptables_rules_neutron.bak{fc.ENDC}", end='\n') 
+
+
 	inn_out_rules = '''
-			
-	trans_port="9040"
-	non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 
-	iptables -F
-	iptables -t nat -F
+### Set variables
+# The UID that Tor runs as (varies from system to system)
 
-	# nat the dns requests to Tor
-	iptables -t nat -A OUTPUT -m owner --uid-owner debian-tor -j RETURN
-	iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 5353 -m comment --comment "neutron_triggered"
-	iptables -t nat -A OUTPUT -p tcp --dport 53 -j REDIRECT --to-ports 5353
-	iptables -t nat -A OUTPUT -p udp -m owner --uid-owner debian-tor -m udp --dport 53 -j REDIRECT --to-ports 5353
-	
-	# resolve .onion domains mapping 10.192.0.0/10 address space to access hidden services
-	iptables -t nat -A OUTPUT -p tcp -d 10.192.0.0/10 -j REDIRECT --to-ports 9040
-	iptables -t nat -A OUTPUT -p udp -d 10.192.0.0/10 -j REDIRECT --to-ports 9040
-	
-	# exclude local addresses
-	for NET in $non_tor 127.0.0.0/9 127.128.0.0/10; do
-		iptables -t nat -A OUTPUT -d $NET -j RETURN
-	done
-	
-	# redirect all other output through TOR transport
-	iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports $trans_port
-	iptables -t nat -A OUTPUT -p udp -j REDIRECT --to-ports $trans_port
-	iptables -t nat -A OUTPUT -p icmp -j REDIRECT --to-ports $trans_port
-	
-	# accept already established connections
-	iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-	
-	# exclude local addresses
-	for NET in $non_tor 127.0.0.0/8; do
-		iptables -A OUTPUT -d $NET -j ACCEPT
-	done
-	
-	# allow only tor output
-	iptables -A OUTPUT -m owner --uid-owner debian-tor -j ACCEPT
-	iptables -A OUTPUT -j REJECT
+_tor_uid=`id -u debian-tor` #Debian/Ubuntu
+
+# Tor's TransPort
+_trans_port="9040"
+
+# Tor's DNSPort
+_dns_port="5353"
+
+# Tor's VirtualAddrNetworkIPv4
+_virt_addr="10.192.0.0/10"
+
+
+# LAN destinations that shouldn't be routed through Tor
+_non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
+
+# Other IANA reserved blocks (These are not processed by tor and dropped by default)
+_resv_iana="0.0.0.0/8 100.64.0.0/10 169.254.0.0/16 192.0.0.0/24 192.0.2.0/24 192.88.99.0/24 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 224.0.0.0/4 240.0.0.0/4 255.255.255.255/32"
+
+# Flushing existing Iptables Chains/Firewall rules #
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
+iptables -F
+iptables -X
+iptables -Z 
+
+### *nat OUTPUT (For local redirection)
+# nat .onion addresses
+iptables -t nat -A OUTPUT -d $_virt_addr -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -j REDIRECT --to-ports $_trans_port
+
+# nat dns requests to Tor
+iptables -t nat -A OUTPUT -d 127.0.0.1/32 -p udp -m udp --dport 53 -j REDIRECT --to-ports $_dns_port -m comment --comment "neutron_triggered"
+
+# Don't nat the Tor process, the loopback, or the local network
+iptables -t nat -A OUTPUT -m owner --uid-owner $_tor_uid -j RETURN
+iptables -t nat -A OUTPUT -o lo -j RETURN
+
+# Allow lan access for hosts in $_non_tor and $_resv_ina
+# This is to make sure that this local addresses don't get dropped.
+for _lan in $_non_tor; do
+  iptables -t nat -A OUTPUT -d $_lan -j RETURN
+done
+
+for _iana in $_resv_iana; do
+  iptables -t nat -A OUTPUT -d $_iana -j RETURN
+done
+
+# Redirect all other pre-routing and output to Tor's TransPort
+iptables -t nat -A OUTPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -j REDIRECT --to-ports $_trans_port
+
+### *filter INPUT
+iptables -A INPUT -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
+
+# Log & Drop everything else. Uncomment to enable logging
+#iptables -A INPUT -j LOG --log-prefix "Dropped INPUT packet: " --log-level 7 --log-uid
+iptables -A INPUT -j DROP
+
+### *filter FORWARD
+iptables -A FORWARD -j DROP
+
+### Fix for possible kernel packet-leak as discussed in, 
+### https://lists.torproject.org/pipermail/tor-talk/2014-March/032507.html
+### uncomment below lines to log dropped packets
+
+iptables -A OUTPUT -m conntrack --ctstate INVALID -j DROP
+# iptables -A OUTPUT -m state --state INVALID -j LOG --log-prefix "Transproxy state leak blocked: " --log-uid
+iptables -A OUTPUT -m state --state INVALID -j DROP
+
+### *filter OUTPUT
+iptables -A OUTPUT -m state --state ESTABLISHED -j ACCEPT
+
+# Allow Tor process output
+iptables -A OUTPUT -m owner --uid-owner $_tor_uid -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -j ACCEPT
+
+# Allow loopback output
+iptables -A OUTPUT -d 127.0.0.1/32 -o lo -j ACCEPT
+
+# Tor transproxy magic
+iptables -A OUTPUT -d 127.0.0.1/32 -p tcp -m tcp --dport $_trans_port --tcp-flags FIN,SYN,RST,ACK SYN -j ACCEPT
+
+
+# Drop everything else.
+iptables -A OUTPUT -j DROP
+
+### Set default policies to DROP
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
 
 	'''
-
+	print(f"{green}Cooking up firewall rules{fc.ENDC}")
 	process5 = subprocess.Popen('/bin/bash', stdin=subprocess.PIPE,
 								stdout=open(os.devnull, 'wb'), stderr=subprocess.PIPE)
 	out5, err5 = process5.communicate(inn_out_rules.encode('utf-8'))
@@ -386,28 +440,89 @@ def firewall():
 		print("""There's something strange with your system
 It doesn't let me change the iptable rules""")
 		sys.exit()
-	time.sleep(1)
+	time.sleep(1.2)
+	print(color(lightred) + "DONE :)" + fc.ENDC)
+
+
+def reset_to_default(reset_trigger, overide_pass):
+	if overide_pass == 0:
+		if reset_trigger >7: sys.exit(f"{red}exiting to prevent memory corruption.{fc.ENDC}")
+		reset_consent = input(f"{color()}This will overwrite all of your existing rules {green}Y(do it){fc.ENDC}/{red}N(exit){fc.ENDC}: ").lower()
+		if reset_consent == 'y': pass
+		elif reset_consent == 'n': sys.exit(f"{red}Copy that..\n{fc.ENDC}")
+		else:
+			reset_trigger += 1
+			return reset_to_default(reset_trigger, overide_pass)
+		
+		time.sleep(1)
+		print(f'{color()}Backing up current rules, just in case..{fc.ENDC}')
+		file_name_id = time.strftime("%m_%d_%Y-%H:%M:%S", time.localtime())
+		proc = subprocess.Popen(f'sudo iptables-save > /tmp/iptables_{file_name_id}.rules', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+		outp, error = proc.communicate()
+		if error and b'Warning:' not in error: 
+			print(f"{red}\nCan't seem to save the iptables_bakup file in /tmp directory.\n{error.decode('utf-8')}")
+			sys.exit()
+		print(f"{lightgreen}Saved in {blue}/tmp{fc.ENDC} as {red}iptables_{file_name_id}.rules{fc.ENDC}", end='\n\n') 
+
+		print(green + fc.BOLD + 'Reseting Iptables' + fc.ENDC)
+	iptables_rules = '''
+
+# Accepting all traffic first#
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+ 
+# Flushing All Iptables Chains/Firewall rules #
+iptables -F
+ 
+# Deleting all Iptables Chains #
+iptables -X
+ 
+# Flushing all counters too #
+iptables -Z 
+# Flush and delete all nat and  mangle #
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -t raw -F
+iptables -t raw -X
+	'''
+	
+	process = subprocess.Popen(
+		'/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	out, err = process.communicate(iptables_rules.encode('utf-8'))
+
+	time.sleep(0.5)
+	if err:
+		print(color() + "Can't reset Iptables")
+		print(color() + '\n' + err.decode('utf8').strip() + fc.ENDC)
+		sys.exit()
+	print(f"{cyan}{fc.BOLD} Successfully reset Iptables to default :)")
+
+	return 0
 
 
 def usage():
 
 	banner = """
-                       _ ._  _ , _ ._
-                     (_ ' ( `  )_  .__)
-                   ( (  (    )   `)  ) _)
-                  (__ (_   (_ . _) _) ,__)
-                      `~~`\ ' . /`~~`
-                      ,::: ;   ; :::,
-                     ':::::::::::::::'
- _________________________/_ __ \_________________________
-|                                                         |
-| 1.Start Neutron        --type in Neutron Start          |
-| 2.Stop neutron         --type in Neutron Stop           |
-| 3.Check ip             --type in Neutron myip           |
-| 4.Change Tor Circuit   --type in Neutron shuffle        |
-| 5.Check Tor Config     --type in Neutron check          |
-| (start,stop,myip,shuffle,config are Non-case sensitive) |
-|_________________________________________________________|
+                            _ ._  _ , _ ._
+                          (_ ' ( `  )_  .__)
+                        ( (  (    )   `)  ) _)
+                       (__ (_   (_ . _) _) ,__)
+                           `~~`\ ' . /`~~`
+                           ,::: ;   ; :::,
+                          ':::::::::::::::'
+ ______________________________/_ __ \_____________________________
+|                                                                  |
+| -h, --help               show this help message and exit         |
+| -m, --mask               start anonymizing                       |
+| -e, --expose             get back to surface-web                 |
+| -i, --ip                 check current IP address                |
+| -s, --shuffle            connect to a different exit-node        |
+| -w, --whatami            check if using tor                      |
+| -n, --nuke               backs up and reset Iptables to default. |
+|__________________________________________________________________|
 
 """
 
@@ -415,29 +530,37 @@ def usage():
 
 
 arg = sys.argv[1:]
+args = {"proxy": ["--mask", "-m"], "surface":["--expose", "-e"], "identity":["--ip", "-i"], 
+		"scramble": ["--shuffle", "-s"], "cover": ['--whatami', '-w'], "revert_tables": ['--nuke', '-n'], "help": ["-h", "--help"]}
+
 
 if len(arg) != 1:
-	usage()
-elif sys.argv[1].casefold() == 'start'.casefold():
+	print(f"{color()}I need one argument: like -m or -e\nplease, use -h/--help for more usage :)\n{fc.ENDC}")
+elif sys.argv[1].lower() in args['proxy']:
 	sudo()
 	logo()
 	configure()
 	firewall()
 	tor_stat(0)
-elif sys.argv[1].casefold() == 'stop'.casefold():
+elif sys.argv[1].lower() in args['surface']:
 	sudo()
 	logo()
 	terminate()
-elif sys.argv[1].casefold() == 'myip'.casefold():
+elif sys.argv[1].lower() in args['identity']:
 	logo()
 	print('\n' + green + 'your ip is: ' + fc.ENDC + color() + ip() + fc.ENDC)
-elif sys.argv[1].casefold() == 'shuffle'.casefold():
+elif sys.argv[1].lower() in args['scramble']:
 	sudo()
 	logo()
 	torcircuit()
-elif sys.argv[1].casefold() == 'check'.casefold():
+elif sys.argv[1].lower() in args['cover']:
 	logo()
 	tor_stat(0)
+elif sys.argv[1].lower() in args['revert_tables']:
+	sudo()
+	reset_to_default(0, 0)
+elif sys.argv[1].lower() in args['help']:
+	usage()
 else:
 	print(
 		f"{color(lightgreen)} {sys.argv[1]}! {color(lightblue)}ain't a valid trigger. {fc.ENDC}")

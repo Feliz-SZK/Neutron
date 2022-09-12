@@ -5,7 +5,7 @@ cyan=`tput setaf 6`
 reset=`tput sgr0`
 
 if [ $(id -u) -ne 0 ]; then
-	echo "${red}You gotta be Superuser, run with 'sudo'${reset}"
+	echo "${red}You gotta be a Superuser, run with 'sudo'${reset}"
 	exit 1
 fi
 
@@ -23,4 +23,4 @@ sudo chmod +x /usr/bin/neutron
 sleep 0.5
 echo "${green}:::::::: [Done] :::::::: ${reset}"
 sleep 0.5
-echo " >>>>>${blue} Open your terminal and type in 'neutron' for usage${reset}"
+echo " >>>>>${blue} Open your terminal and type in 'neutron -h' for usage${reset}"
