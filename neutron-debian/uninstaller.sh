@@ -18,14 +18,14 @@ clear
 echo "${cyan}******* Neutron Uninstaller ********${reset}"
 
 if ! command -v ${binary} > /dev/null; then
-  echo "${red}\nneutron isn't installed.\n${reset}"
+  printf "${red}\nneutron isn't installed.${reset}\n\n"
   exit 1
 fi
 
-echo "${green}\n>>>>> Cleaning up remnants.... ${reset}"
+printf "${green}\n>>>>> Cleaning up remnants.... ${reset}\n"
 neutron -e > /dev/null 2>&1
 sleep 1
 echo "${green}>>>>> Removing neutron binary...."
 /usr/bin/rm /usr/bin/neutron
 sleep 1
-echo "${blue}\n>>>>>Uninstalling Complete<<<<<${reset}\n"
+printf "${blue}\n>>>>> Uninstalling Complete${reset}\n\n"
