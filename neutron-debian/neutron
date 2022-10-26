@@ -100,12 +100,6 @@ https://github.com/Feliz-SZK/Linux-Decoded/blob/master/Fix%20temporary%20failure
 	return ip_
 
 
-def returnNotMatches(a, b):
-	a = set(a)
-	b = set(b)
-	return (a-b)
-
-
 def frag():
 	fragment = subprocess.Popen("iptables -t nat -L -n", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
 	frag, defrag = fragment
@@ -265,7 +259,7 @@ else your system has some serious paranoia(deleting backups itself)''' + fc.ENDC
 		print(f"{cyan}{fc.BOLD}[Done]{fc.ENDC}")
 	if "neutron" in frag():
 		trigger += 1
-		print(green + fc.BOLD + 'Restoring Iptables rules' + fc.ENDC)
+		print(green + fc.BOLD + 'Restoring Iptables rules..' + fc.ENDC)
 		if os.path.exists("/etc/iptables_rules_neutron.bak"):
 			one, zero = subprocess.Popen('iptables-restore < /etc/iptables_rules_neutron.bak', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
 			os.remove('/etc/iptables_rules_neutron.bak')
@@ -273,9 +267,8 @@ else your system has some serious paranoia(deleting backups itself)''' + fc.ENDC
 				print(f"{red} can't restore previous rules, seems the file's being tampered with\n{lightred} {zero.decode('utf-8').strip()}{fc.ENDC}")
 				print(f"{green}{fc.BOLD}Defaulting..{fc.ENDC}")
 				reset_to_default(0,1)
-		else:
-			print(f"{color()} It seems the Iptables backup is deleted, defaulting..{fc.ENDC}") 
-			reset_to_default(0,1)
+		else: 
+			reset_to_default(0, 1, "is_default")
 		time.sleep(1)
 
 	if trigger == 0:
@@ -324,12 +317,19 @@ if this persists, please raise an issue on github.\n\n{color(red)}{e}""" + fc.EN
 def firewall():
 
 	print(f"{green}Backing up Iptables..{fc.ENDC}")
-	proc = subprocess.Popen('iptables-save > /etc/iptables_rules_neutron.bak', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-	outp, error = proc.communicate()
-	if error and b'Warning:' not in error: 
-		print(f"{red}\nCan't seem to save the iptables_bakup file in /etc.\n{error.decode('utf-8')}")
+	firewall_green, firewall_red = subprocess.Popen(r"iptables-save | grep '^\-' | wc -l", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+	if firewall_red:
+		print(f"{red}\nCan't execute {blue}iptables-save{fc.ENDC}. see the reson below.\n{red}{fc.BOLD}{firewall_red.decode('utf-8')}{fc.ENDC}")
 		sys.exit()
-	print(f"{lightred}Done :) {blue}location: {red}/etc/iptables_rules_neutron.bak{fc.ENDC}", end='\n') 
+	if firewall_green.strip() == b'0':
+		print(f" {lightblue}default rules are configured, skipping..")
+	else:
+		proc = subprocess.Popen('iptables-save > /etc/iptables_rules_neutron.bak', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+		outp, error = proc.communicate()
+		if error and b'Warning:' not in error: 
+			print(f"{red}\nCan't seem to save the iptables_bakup file in /etc.\n{error.decode('utf-8')}")
+			sys.exit()
+		print(f"{lightred}Done :) {blue}location: {red}/etc/iptables_rules_neutron.bak{fc.ENDC}", end='\n') 
 
 
 	inn_out_rules = '''
@@ -363,6 +363,13 @@ iptables -P OUTPUT ACCEPT
 iptables -F
 iptables -X
 iptables -Z 
+
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -t raw -F
+iptables -t raw -X
 
 ### *nat OUTPUT (For local redirection)
 # nat .onion addresses
@@ -444,7 +451,7 @@ It doesn't let me change the iptable rules""")
 	print(color(lightred) + "DONE :)" + fc.ENDC)
 
 
-def reset_to_default(reset_trigger, overide_pass):
+def reset_to_default(reset_trigger, overide_pass, *args):
 	if overide_pass == 0:
 		if reset_trigger >7: sys.exit(f"{red}exiting to prevent memory corruption.{fc.ENDC}")
 		reset_consent = input(f"{color()}This will overwrite all of your existing rules {green}Y(do it){fc.ENDC}/{red}N(exit){fc.ENDC}: ").lower()
@@ -498,7 +505,10 @@ iptables -t raw -X
 		print(color() + "Can't reset Iptables")
 		print(color() + '\n' + err.decode('utf8').strip() + fc.ENDC)
 		sys.exit()
-	print(f"{cyan}{fc.BOLD} Successfully reset Iptables to default :)")
+	if args and args[0] == "is_default":
+		pass
+	else:
+		print(f"{cyan}{fc.BOLD} Successfully reset Iptables to default :)")
 
 	return 0
 
