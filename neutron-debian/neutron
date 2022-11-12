@@ -21,24 +21,26 @@ lightred = '\033[91m'
 lightgreen = '\033[92m'
 yellow = '\033[93m'
 lightblue = '\033[94m'
-pink = '\033[95m'
 lightcyan = '\033[96m'
 
 
+color_taken = []
+
 def color(*args):
-	colors = [red, green, orange, blue, purple, cyan,
-			 lightgreen, lightred, yellow, pink, darkgrey]
+	colors = [blue, purple, cyan,
+			yellow, darkgrey]
 	if args:
 		args, = args
 		return args
 	else:
-		return random.choice(colors)
+		if not color_taken: return random.choice(colors)
+		else:
+			return random.choice(list(set(colors).difference(color_taken)))
 
 
 class fc:
 	ENDC = '\033[0m'
 	BOLD = '\033[1m'
-	ENDC = '\033[0m'
 
 
 def sudo():
@@ -55,10 +57,11 @@ if __name__ == '__main__':
 	signal(SIGINT, handler)
 
 
-def logo():
+def logo(*args):
+
+	global color_taken
 
 	logo = r'''
-
 _____   __           _____
 ___  | / /________  ___  /____________________
 __   |/ /_  _ \  / / /  __/_  ___/  __ \_  __ \
@@ -66,19 +69,23 @@ _  /|  / /  __/ /_/ // /_ _  /   / /_/ /  / / /
 /_/ |_/  \___/\__,_/ \__/ /_/    \____//_/ /_/
 '''
 
-	wordsalads = ["Freedom's just another word for missing someone.", "The quieter you become the more you are able to hear.",
-				  "It's good to be different but never belittle that angel on your shoulder.",
+	wordsalads = ["""{}Freedom's just another word for missing someone {}(ღ˘⌣˘)❛ั◡❛ัღ)""", """{}The quieter you become the more you are able to hear{} 〆(・∀・＠ )""",
+				  """{}It's good to be different but never belittle that angel on your shoulder{} ✿(੭*ˊᵕˋ)੭*""",
 
-				  "Good love will find you.", "My heart is beating a little extra today.",
-				  """Smile with all your teeth :)""", "This is a just reminder that you're strong, beautiful and worthy of love.",
-				  "Treat every women like a princess.", "Never take the fact that you're a good listener as granted.",
-				  "Don't think too much, it'll hurt your head.", "You may loose a lot of battles but never loose the sight of the war.",
-				  "Love is a dance.."
+				  """{}Good love will find you{} っ◕‿◕)っ ♥""", """{}My heart is beating a little extra today{} (´･ᴗ･`)♡""",
+				  """{}Smile with all your teeth{} ʕ•̬͡•ʔ""", """{}This is a just reminder that you're strong, beautiful and worthy of love{} (′◕ᴗ◕‵)""",
+				  """{}Treat every women like a princess{} ( ◠‿◠✿)""", """{}Never take the fact that you're a good listener as granted{} ٩(˘◡˘)۶""",
+				  """{}Don't think too much, it'll hurt your head{} ʕ•̬͡•ʔ""", """{}You may loose a lot of battles but never loose the sight of the war{} ᕦʕ•̀ᴥ•́ʔᕤ""",
+				  """{}Love is a dance{} ໒( ♥ ◡ ♥ )७"""
 				  ]
 
 	wordsalad = random.choice(wordsalads)
-	print(color() + fc.BOLD + logo + fc.ENDC, flush=True)
-	print(color() + fc.BOLD + wordsalad.strip("\n") + fc.ENDC)
+	color_taken.append(color())
+	color_taken.append(color())
+	
+	print(f"{color_taken[0]}{logo}{fc.ENDC}", end = '\n', flush=True)
+	print(wordsalad.strip("\n").format(color_taken[1], color()) + fc.ENDC, sep=fc.BOLD, flush=True)
+	if args: time.sleep(0.8)
 
 
 def ip():
@@ -454,7 +461,7 @@ It doesn't let me change the iptable rules""")
 def reset_to_default(reset_trigger, overide_pass, *args):
 	if overide_pass == 0:
 		if reset_trigger >7: sys.exit(f"{red}exiting to prevent memory corruption.{fc.ENDC}")
-		reset_consent = input(f"{color()}This will overwrite all of your existing rules {green}Y(do it){fc.ENDC}/{red}N(exit){fc.ENDC}: ").lower()
+		reset_consent = input(f"{color()}\nThis will overwrite all of your existing rules {green}Y(do it){fc.ENDC}/{red}N(exit){fc.ENDC}: ").lower()
 		if reset_consent == 'y': pass
 		elif reset_consent == 'n': sys.exit(f"{red}Copy that..\n{fc.ENDC}")
 		else:
@@ -548,26 +555,27 @@ if len(arg) != 1:
 	print(f"{color()}I need one argument: like -m or -e\nplease, use -h/--help for more usage :)\n{fc.ENDC}")
 elif sys.argv[1].lower() in args['proxy']:
 	sudo()
-	logo()
+	logo("sleep")
 	configure()
 	firewall()
 	tor_stat(0)
 elif sys.argv[1].lower() in args['surface']:
 	sudo()
-	logo()
+	logo("sleep")
 	terminate()
 elif sys.argv[1].lower() in args['identity']:
 	logo()
 	print('\n' + green + 'your ip is: ' + fc.ENDC + color() + ip() + fc.ENDC)
 elif sys.argv[1].lower() in args['scramble']:
 	sudo()
-	logo()
+	logo("sleep")
 	torcircuit()
 elif sys.argv[1].lower() in args['cover']:
 	logo()
 	tor_stat(0)
 elif sys.argv[1].lower() in args['revert_tables']:
 	sudo()
+	logo("sleep")
 	reset_to_default(0, 0)
 elif sys.argv[1].lower() in args['help']:
 	usage()
