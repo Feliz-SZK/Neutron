@@ -22,6 +22,7 @@ lightgreen = '\033[92m'
 yellow = '\033[93m'
 lightblue = '\033[94m'
 lightcyan = '\033[96m'
+lightpurple = '\033[95m'
 
 
 color_taken = []
@@ -271,9 +272,9 @@ else your system has some serious paranoia(deleting backups itself)''' + fc.ENDC
             if zero and b"Warning" not in zero:
                 print(f"{red} can't restore previous rules, seems the file's being tampered with\n{lightred} {zero.decode('utf-8').strip()}{fc.ENDC}")
                 print(f"{green}{fc.BOLD}Defaulting..{fc.ENDC}")
-                reset_to_default(0,1)
+                reset_to_default(overide_pass=True)
         else:             
-            reset_to_default(0, 1, "is_default")
+            reset_to_default(overide_pass=True, reset_as_child_func=True)
         time.sleep(1)
 
     if trigger == 0:
@@ -307,7 +308,7 @@ def tor_stat(e_backoff):
         if e_backoff > 2:
             sys.exit(color() + f"""\nUnable to get the network-details, try with -w once.
 if this persists, please raise an issue on github.\n\n{color(red)}{e}""" + fc.ENDC)
-        print(f"{color(lightgreen)}\nhaving trouble fetching exit-node details, {cyan}retrying....{e_backoff}{fc.ENDC}")
+        print(f"{color(lightgreen)}\nhaving trouble fetching exit-node details, {cyan}retrying....{color()}{e_backoff}{fc.ENDC}")
         time.sleep(1.2)
         return tor_stat(e_backoff)
 
@@ -318,11 +319,14 @@ if this persists, please raise an issue on github.\n\n{color(red)}{e}""" + fc.EN
     print(f"{color()}Congratulations, you're using tor :){fc.ENDC}") if "Congratulations" in status.strip() else print(f"{color()}{status.strip()}{fc.ENDC}")
     return 0
 
+def check_default_rules(shell:bool = True):
+    return subprocess.Popen(r"iptables-save | grep '^\-' | wc -l", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell).communicate()
+
 
 def firewall():
 
     print(f"{green}Backing up Iptables..{fc.ENDC}")
-    firewall_green, firewall_red = subprocess.Popen(r"iptables-save | grep '^\-' | wc -l", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+    firewall_green, firewall_red = check_default_rules()
     if firewall_red:
         print(f"{red}\nCan't execute {blue}iptables-save{fc.ENDC}. see the reson below.\n{red}{fc.BOLD}{firewall_red.decode('utf-8')}{fc.ENDC}")
         sys.exit()
@@ -457,27 +461,37 @@ It doesn't let me change the iptable rules""")
     print(color(lightred) + "DONE :)" + fc.ENDC)
 
 
-def reset_to_default(reset_trigger, overide_pass, *args):
-    if overide_pass == 0:
+def reset_to_default(reset_trigger: int= 0, overide_pass: bool= False, reset_as_child_func:bool = False, nuke_sanity:bool = False):
+
+    if not overide_pass:
         if reset_trigger >7: sys.exit(f"{red}exiting to prevent memory corruption.{fc.ENDC}")
         reset_consent = input(f"{color()}\nThis will overwrite all of your existing rules {green}Y(do it){fc.ENDC}/{red}N(exit){fc.ENDC}: ").lower()
         if reset_consent == 'y': pass
         elif reset_consent == 'n': sys.exit(f"{red}Copy that..\n{fc.ENDC}")
         else:
             reset_trigger += 1
-            return reset_to_default(reset_trigger, overide_pass)
+            return reset_to_default(reset_trigger=reset_trigger)
         
         time.sleep(1)
-        print(f'{color()}Backing up current rules, just in case..{fc.ENDC}')
-        file_name_id = time.strftime("%m_%d_%Y-%H:%M:%S", time.localtime())
-        proc = subprocess.Popen(f'sudo iptables-save > /tmp/iptables_{file_name_id}.rules', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        outp, error = proc.communicate()
-        if error and b'Warning:' not in error: 
-            print(f"{red}\nCan't seem to save the iptables_bakup file in /tmp directory.\n{error.decode('utf-8')}")
+        print(f'{lightpurple}Backing up current rules, just in case..{fc.ENDC}')
+        
+        default_check_green, default_check_red = check_default_rules()
+        if default_check_red:
+            print(f"{red}Error while checking existing rules; {orange}exiting..\n{yellow}Error message: {color()}{default_check_red.decode('utf-8')}{fc.ENDC}")
             sys.exit()
-        print(f"{lightgreen}Saved in {blue}/tmp{fc.ENDC} as {red}iptables_{file_name_id}.rules{fc.ENDC}", end='\n\n') 
-
-        print(green + fc.BOLD + 'Reseting Iptables' + fc.ENDC)
+        if default_check_green.strip() != b'0': 
+            file_name_id = time.strftime("%m_%d_%Y-%H:%M:%S", time.localtime())
+            proc = subprocess.Popen(f'sudo iptables-save > /tmp/iptables_{file_name_id}.rules', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            outp, error = proc.communicate()
+            if error and b'Warning:' not in error: 
+                print(f"{red}\nCan't seem to save the iptables_bakup file in /tmp directory.\n{error.decode('utf-8')}")
+                sys.exit()
+            print(f"{lightcyan}Saved in {blue}/tmp{fc.ENDC} as {red}iptables_{file_name_id}.rules{fc.ENDC}", end='\n\n') 
+        else:
+            print(f"{orange} Default rules are set, backup not required :){fc.ENDC}", end= "\n")
+            nuke_sanity = True
+            
+        print(orange + fc.BOLD + 'Reseting Iptables' + fc.ENDC) if not nuke_sanity else print(f"{cyan}{fc.BOLD}I'm nuking everything just for sanity{fc.ENDC}")
     iptables_rules = '''
 
 # Accepting all traffic first#
@@ -511,10 +525,10 @@ iptables -t raw -X
         print(color() + "Can't reset Iptables")
         print(color() + '\n' + err.decode('utf8').strip() + fc.ENDC)
         sys.exit()
-    if args and args[0] == "is_default":
+    if reset_as_child_func:
         pass
     else:
-        print(f"{cyan}{fc.BOLD} Successfully reset Iptables to default :)")
+        print(f"{lightblue} Successfully reset Iptables to default :)")
 
     return 0
 
@@ -574,7 +588,7 @@ elif sys.argv[1].lower() in args['cover']:
 elif sys.argv[1].lower() in args['revert_tables']:
     sudo()
     logo("sleep")
-    reset_to_default(0, 0)
+    reset_to_default()
 elif sys.argv[1].lower() in args['help']:
     usage()
 else:
