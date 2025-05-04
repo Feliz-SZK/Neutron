@@ -9,44 +9,49 @@ import requests
 import subprocess
 import re
 
-red = '\033[31m'
-green = '\033[32m'
-orange = '\033[33m'
-blue = '\033[34m'
-purple = '\033[35m'
-cyan = '\033[36m'
-lightgrey = '\033[37m'
-darkgrey = '\033[90m'
-lightred = '\033[91m'
-lightgreen = '\033[92m'
-yellow = '\033[93m'
-lightblue = '\033[94m'
-lightcyan = '\033[96m'
-lightpurple = '\033[95m'
+red = "\033[31m"
+green = "\033[32m"
+orange = "\033[33m"
+blue = "\033[34m"
+purple = "\033[35m"
+cyan = "\033[36m"
+lightgrey = "\033[37m"
+darkgrey = "\033[90m"
+lightred = "\033[91m"
+lightgreen = "\033[92m"
+yellow = "\033[93m"
+lightblue = "\033[94m"
+lightcyan = "\033[96m"
+lightpurple = "\033[95m"
 
 
 color_taken = []
 
+
 def color(*args):
-    colors = [blue, purple, cyan,
-             yellow, darkgrey]
+    colors = [blue, purple, cyan, yellow, darkgrey]
     if args:
-        args, = args
+        (args,) = args
         return args
     else:
-        if not color_taken: return random.choice(colors)
+        if not color_taken:
+            return random.choice(colors)
         else:
             return random.choice(list(set(colors).difference(color_taken)))
 
 
 class fc:
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
 
 
 def sudo():
     if not os.geteuid() == 0:
-        sys.exit(color() + "I'm affraid I need some superuser privilages, start with 'sudo'" + fc.ENDC)
+        sys.exit(
+            color()
+            + "I'm affraid I need some superuser privilages, start with 'sudo'"
+            + fc.ENDC
+        )
 
 
 def handler(signal_received, frame):
@@ -54,7 +59,7 @@ def handler(signal_received, frame):
     exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     signal(SIGINT, handler)
 
 
@@ -62,70 +67,100 @@ def logo(*args):
 
     global color_taken
 
-    logo = r'''
+    logo = r"""
 _____   __           _____
 ___  | / /________  ___  /____________________
 __   |/ /_  _ \  / / /  __/_  ___/  __ \_  __ \
 _  /|  / /  __/ /_/ // /_ _  /   / /_/ /  / / /
 /_/ |_/  \___/\__,_/ \__/ /_/    \____//_/ /_/
-'''
+"""
 
-    wordsalads = ["""{}Freedom's just another word for missing someone {}(ღ˘⌣˘)❛ั◡❛ัღ)""", """{}The quieter you become the more you are able to hear{} 〆(・∀・＠ )""",
-                  """{}It's good to be different but never belittle that angel on your shoulder{} ✿(੭*ˊᵕˋ)੭*""",
-
-                  """{}Good love will find you{} っ◕‿◕)っ ♥""", """{}My heart is beating a little extra today{} (´･ᴗ･`)♡""",
-                  """{}Smile with all your teeth{} ʕ•̬͡•ʔ""", """{}This is a just reminder that you're strong, beautiful and worthy of love{} (′◕ᴗ◕‵)""",
-                  """{}Treat every women like a princess{} ( ◠‿◠✿)""", """{}Never take the fact that you're a good listener as granted{} ٩(˘◡˘)۶""",
-                  """{}Don't think too much, it'll hurt your head{} ʕ•̬͡•ʔ""", """{}You may loose a lot of battles but never loose the sight of the war{} ᕦʕ•̀ᴥ•́ʔᕤ""",
-                  """{}Love is a dance{} ໒( ♥ ◡ ♥ )७"""
-                  ]
+    wordsalads = [
+        """{}Freedom's just another word for missing someone {}(ღ˘⌣˘)❛ั◡❛ัღ)""",
+        """{}The quieter you become the more you are able to hear{} 〆(・∀・＠ )""",
+        """{}It's good to be different but never belittle that angel on your shoulder{} ✿(੭*ˊᵕˋ)੭*""",
+        """{}Good love will find you{} っ◕‿◕)っ ♥""",
+        """{}My heart is beating a little extra today{} (´･ᴗ･`)♡""",
+        """{}Smile with all your teeth{} ʕ•̬͡•ʔ""",
+        """{}This is a just reminder that you're strong, beautiful and worthy of love{} (′◕ᴗ◕‵)""",
+        """{}Treat every women like a princess{} ( ◠‿◠✿)""",
+        """{}Never take the fact that you're a good listener as granted{} ٩(˘◡˘)۶""",
+        """{}Don't think too much, it'll hurt your head{} ʕ•̬͡•ʔ""",
+        """{}You may loose a lot of battles but never loose the sight of the war{} ᕦʕ•̀ᴥ•́ʔᕤ""",
+        """{}Love is a dance{} ໒( ♥ ◡ ♥ )७""",
+    ]
 
     wordsalad = random.choice(wordsalads)
     color_taken.append(color())
     color_taken.append(color())
 
-    print(f"{color_taken[0]}{logo}{fc.ENDC}", end = '\n', flush=True)
-    print(wordsalad.strip("\n").format(color_taken[1], color()) + fc.ENDC, sep=fc.BOLD, flush=True)
-    if args: time.sleep(0.8)
+    print(f"{color_taken[0]}{logo}{fc.ENDC}", end="\n", flush=True)
+    print(
+        wordsalad.strip("\n").format(color_taken[1], color()) + fc.ENDC,
+        sep=fc.BOLD,
+        flush=True,
+    )
+    if args:
+        time.sleep(0.8)
 
 
 def ip():
     try:
-        ip_ = requests.get('https://icanhazip.com/').text
+        ip_ = requests.get("https://icanhazip.com/").text
     except requests.exceptions.RequestException:
         try:
-            ip1 = requests.get('https://ipinfo.io/ip').text
+            ip1 = requests.get("https://ipinfo.io/ip").text
             return ip1
         except requests.exceptions.RequestException as e:
-            print(f'\n{e}')
-            sys.exit(color() + """\nSorry, can't fetch the deets.
+            print(f"\n{e}")
+            sys.exit(
+                color()
+                + """\nSorry, can't fetch the deets.
 Either the site's down or something's up with your internet-config.
 
 you may found the solution here :)
-https://github.com/Feliz-SZK/Linux-Decoded/blob/master/Fix%20temporary%20failure%20in%20name%20resolution.md""" + fc.ENDC)
-
+https://github.com/Feliz-SZK/Linux-Decoded/blob/master/Fix%20temporary%20failure%20in%20name%20resolution.md"""
+                + fc.ENDC
+            )
 
     return ip_
 
 
 def frag():
-    fragment = subprocess.Popen("iptables -t nat -L -n", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+    fragment = subprocess.Popen(
+        "iptables -t nat -L -n",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=True,
+    ).communicate()
     frag, defrag = fragment
-    if defrag: print(f"\n{red}encounterd some hiccups while checking the iptables-deets{fc.ENDC}")
+    if defrag:
+        print(
+            f"\n{red}encounterd some hiccups while checking the iptables-deets{fc.ENDC}"
+        )
     return frag.decode("utf-8")
+
 
 def finesse(backoff, resolv_switch):
 
     if backoff > 5:
         sys.exit(
-            f"\n{color(red)}excceeded no of retries, terminating to prevent memory corruption.{fc.ENDC}")
+            f"\n{color(red)}excceeded no of retries, terminating to prevent memory corruption.{fc.ENDC}"
+        )
 
-    if not os.path.exists('/etc/resolv.conf'):
+    if not os.path.exists("/etc/resolv.conf"):
         print(f"\n{color(lightblue)}resolv.conf file is missing,", end=" ")
-        askin = str(input(
-            f"{color(lightblue)}you want me to manually create it for ya! {lightgreen}Y/N: {fc.ENDC}")).lower().strip()
+        askin = (
+            str(
+                input(
+                    f"{color(lightblue)}you want me to manually create it for ya! {lightgreen}Y/N: {fc.ENDC}"
+                )
+            )
+            .lower()
+            .strip()
+        )
 
-        if askin == 'y':
+        if askin == "y":
             try:
                 with open("/etc/resolv.conf", "w") as f:
                     f.write("nameserver 127.0.0.1")
@@ -133,7 +168,8 @@ def finesse(backoff, resolv_switch):
                 print(f"{color()}Done, saved with local dns.{fc.ENDC}")
             except Exception as e:
                 print(
-                    f"{color(red)}something's wrong, can't write the file.{fc.ENDC}\n{e}")
+                    f"{color(red)}something's wrong, can't write the file.{fc.ENDC}\n{e}"
+                )
         elif askin == "n":
             sys.exit(f"{color(green)}Roger that, terminating....{fc.ENDC}")
         else:
@@ -142,37 +178,42 @@ def finesse(backoff, resolv_switch):
     return resolv_switch
 
 
-torrstring = ["User tor", "VirtualAddrNetworkIPv4 10.192.0.0/10", 'AutomapHostsOnResolve 1',
-              'TransPort 9040 IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDestPort', 'DNSPort 5353', 'CookieAuthentication 1', "DataDirectory /var/lib/tor"]
+torrstring = [
+    "User tor",
+    "VirtualAddrNetworkIPv4 10.192.0.0/10",
+    "AutomapHostsOnResolve 1",
+    "TransPort 9040 IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDestPort",
+    "DNSPort 5353",
+    "CookieAuthentication 1",
+    "DataDirectory /var/lib/tor",
+]
 
 
-resolvstring = 'nameserver 127.0.0.1'
+resolvstring = "nameserver 127.0.0.1"
 
 
 def resolv_config(r_switch):
     if r_switch == 0:
-        with open('/etc/resolv.conf') as f:
+        with open("/etc/resolv.conf") as f:
             lines = f.read().splitlines()
 
         if resolvstring not in lines:
             print(green + fc.BOLD + "Configuring resolv.conf" + fc.ENDC)
             time.sleep(0.4)
-            os.system(
-                    "cp /etc/resolv.conf /etc/resolv.conf.backup_neutron")
-            with open('/etc/resolv.conf', 'w') as rconf:
+            os.system("cp /etc/resolv.conf /etc/resolv.conf.backup_neutron")
+            with open("/etc/resolv.conf", "w") as rconf:
                 rconf.write("%s\n" % resolvstring)
             print(color(lightred) + "DONE :)" + fc.ENDC)
         else:
-            if resolvstring in list(filter(lambda rc: 'nameserver' in rc, lines))[0]:
+            if resolvstring in list(filter(lambda rc: "nameserver" in rc, lines))[0]:
                 print(green + fc.BOLD + "Configuring Resolv.config" + fc.ENDC)
                 time.sleep(0.4)
                 print(color() + fc.BOLD + """ :) Already Configured""" + fc.ENDC)
                 time.sleep(0.5)
             else:
                 print(green + fc.BOLD + "Configuring resolv.conf" + fc.ENDC)
-                os.system(
-                    "cp /etc/resolv.conf /etc/resolv.conf.backup_neutron")
-                with open('/etc/resolv.conf', 'w') as rconf:
+                os.system("cp /etc/resolv.conf /etc/resolv.conf.backup_neutron")
+                with open("/etc/resolv.conf", "w") as rconf:
                     rconf.write("%s\n" % resolvstring)
                 print(color(lightred) + "Done...." + fc.ENDC)
     else:
@@ -185,17 +226,19 @@ def resolv_config(r_switch):
 
 def configure():
 
-    if "neutron" in frag(): sys.exit(f"\n{lightblue}neutron is already running....{fc.ENDC}")
+    if "neutron" in frag():
+        sys.exit(f"\n{lightblue}neutron is already running....{fc.ENDC}")
 
     r_switch = finesse(0, 0)
 
     if os.system("which tor > /dev/null") == 0:
-    
-        if not os.path.exists('/etc/tor/torrc'):
+
+        if not os.path.exists("/etc/tor/torrc"):
             print(
-                f"{color(red)}No torrc file is configured.....{fc.ENDC}{color(green)}Configuring:)")
+                f"{color(red)}No torrc file is configured.....{fc.ENDC}{color(green)}Configuring:)"
+            )
             try:
-                f = open('/etc/tor/torrc', 'w+')
+                f = open("/etc/tor/torrc", "w+")
                 for elements in torrstring:
                     f.write("%s\n" % elements)
                 f.close()
@@ -207,87 +250,115 @@ def configure():
             print(f"\n{color(green)}{fc.BOLD}Configuring Torrc {fc.ENDC}")
             time.sleep(0.4)
 
-            with open('/etc/tor/torrc') as x:
+            with open("/etc/tor/torrc") as x:
                 verse = x.read().splitlines()
 
-            subprocess.Popen(["cp", "/etc/tor/torrc", "/etc/tor/torrc.bak_neutron"], stdout=subprocess.PIPE).communicate()
-            torrc = open('/etc/tor/torrc', 'w')
+            subprocess.Popen(
+                ["cp", "/etc/tor/torrc", "/etc/tor/torrc.bak_neutron"],
+                stdout=subprocess.PIPE,
+            ).communicate()
+            torrc = open("/etc/tor/torrc", "w")
             for elements in torrstring:
                 torrc.write("%s\n" % elements)
             torrc.close()
             print(f"{color(lightred)}DONE :){fc.ENDC}")
 
     else:
-        print(f'''\n{color(red)}tor isn't installed, install it with
-'sudo pacman -S tor'{fc.ENDC}''')
+        print(
+            f"""\n{color(red)}tor isn't installed, install it with
+'sudo pacman -S tor'{fc.ENDC}"""
+        )
         sys.exit()
 
-    subprocess.Popen(['systemctl', 'restart', 'tor'])
+    subprocess.Popen(["systemctl", "restart", "tor"])
 
     resolv_config(r_switch)
-
 
 
 def terminate():
 
     trigger = 0
-    if os.path.exists('/etc/resolv.conf.backup_neutron'):
+    if os.path.exists("/etc/resolv.conf.backup_neutron"):
         trigger += 1
         restore = "yes | mv /etc/resolv.conf.backup_neutron /etc/resolv.conf"
-        process = subprocess.Popen('/bin/bash', stdin=subprocess.PIPE,
-                                   stdout=open(os.devnull, 'wb'), stderr=subprocess.PIPE)
+        process = subprocess.Popen(
+            "/bin/bash",
+            stdin=subprocess.PIPE,
+            stdout=open(os.devnull, "wb"),
+            stderr=subprocess.PIPE,
+        )
         print(f"\n{green}{fc.BOLD}reverting to default resolv.conf{fc.ENDC}")
-        out, err = process.communicate(restore.encode('utf-8'))
+        out, err = process.communicate(restore.encode("utf-8"))
 
         if err:
-            print('\n' + err.decode('utf8').replace("\n", '\n'))
-            print(red + r'''\nI guess you're playing around,
-else your system has some serious paranoia; deleting backups itself.''' + fc.ENDC)
+            print("\n" + err.decode("utf8").replace("\n", "\n"))
+            print(
+                red
+                + r"""\nI guess you're playing around,
+else your system has some serious paranoia; deleting backups itself."""
+                + fc.ENDC
+            )
             sys.exit()
         time.sleep(0.5)
         print(f"{cyan}{fc.BOLD}[Complete]{fc.ENDC}")
-    
-    if os.path.exists('/etc/tor/torrc.bak_neutron'):
+
+    if os.path.exists("/etc/tor/torrc.bak_neutron"):
         trigger += 1
         torrc_restore = "mv /etc/tor/torrc.bak_neutron /etc/tor/torrc"
-        process = subprocess.Popen('/bin/bash', stdin=subprocess.PIPE,
-                                   stdout=open(os.devnull, 'wb'), stderr=subprocess.PIPE)
+        process = subprocess.Popen(
+            "/bin/bash",
+            stdin=subprocess.PIPE,
+            stdout=open(os.devnull, "wb"),
+            stderr=subprocess.PIPE,
+        )
         print(f"{green}{fc.BOLD}dropping of torrc file{fc.ENDC}")
-        out, err = process.communicate(torrc_restore.encode('utf-8'))
+        out, err = process.communicate(torrc_restore.encode("utf-8"))
 
         if err:
-            print('\n' + err.decode('utf8').replace("\n", '\n'))
+            print("\n" + err.decode("utf8").replace("\n", "\n"))
             print(" ")
-            print(green + r'''I guess you're playing around, 
-else your system has some serious paranoia(deleting backups itself)''' + fc.ENDC)
+            print(
+                green
+                + r"""I guess you're playing around, 
+else your system has some serious paranoia(deleting backups itself)"""
+                + fc.ENDC
+            )
             sys.exit()
         time.sleep(0.5)
         print(f"{cyan}{fc.BOLD}[Done]{fc.ENDC}")
     if "neutron" in frag():
         trigger += 1
-        print(green + fc.BOLD + 'Restoring Iptables rules..' + fc.ENDC)
+        print(green + fc.BOLD + "Restoring Iptables rules.." + fc.ENDC)
         if os.path.exists("/etc/iptables_rules_neutron.bak"):
-            one, zero = subprocess.Popen('iptables-restore < /etc/iptables_rules_neutron.bak', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
-            os.remove('/etc/iptables_rules_neutron.bak')
+            one, zero = subprocess.Popen(
+                "iptables-restore < /etc/iptables_rules_neutron.bak",
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=True,
+            ).communicate()
+            os.remove("/etc/iptables_rules_neutron.bak")
             if zero and b"Warning" not in zero:
-                print(f"{red} can't restore previous rules, seems the file's being tampered with\n{lightred} {zero.decode('utf-8').strip()}{fc.ENDC}")
+                print(
+                    f"{red} can't restore previous rules, seems the file's being tampered with\n{lightred} {zero.decode('utf-8').strip()}{fc.ENDC}"
+                )
                 print(f"{green}{fc.BOLD}Defaulting..{fc.ENDC}")
                 reset_to_default(overide_pass=True)
-        else:             
+        else:
             reset_to_default(overide_pass=True, reset_as_child_func=True)
         time.sleep(1)
 
     if trigger == 0:
-        print('\n' + red + fc.BOLD + "No instances of Neutron has been executed")
-        print(green + fc.BOLD + '[Exiting...]' + fc.ENDC)
+        print("\n" + red + fc.BOLD + "No instances of Neutron has been executed")
+        print(green + fc.BOLD + "[Exiting...]" + fc.ENDC)
         sys.exit()
-    else: print(color() + fc.BOLD + 'Cleaning up complete :)' + fc.ENDC)
+    else:
+        print(color() + fc.BOLD + "Cleaning up complete :)" + fc.ENDC)
 
 
 def torcircuit():
 
     if not "neutron" in frag():
-        print('\n' + color() + 'You gotta start Neutron first' + fc.ENDC)
+        print("\n" + color() + "You gotta start Neutron first" + fc.ENDC)
         sys.exit()
     else:
         subprocess.Popen(["systemctl", "restart", "tor"])
@@ -295,8 +366,15 @@ def torcircuit():
         time.sleep(0.4)
         print(color() + fc.BOLD + "DONE :)" + fc.ENDC)
         time.sleep(0.4)
-        print(green + "Your new ip appears to be: " +
-              fc.ENDC + color() + fc.BOLD + str(ip()) + fc.ENDC)
+        print(
+            green
+            + "Your new ip appears to be: "
+            + fc.ENDC
+            + color()
+            + fc.BOLD
+            + str(ip())
+            + fc.ENDC
+        )
 
 
 def tor_stat(e_backoff):
@@ -306,21 +384,37 @@ def tor_stat(e_backoff):
     except Exception as e:
         e_backoff += 1
         if e_backoff > 2:
-            sys.exit(color() + f"""\nUnable to get the network-details, try with -w once.
-if this persists, please raise an issue on github.\n\n{color(red)}{e}""" + fc.ENDC)
-        print(f"{color(lightgreen)}\nhaving trouble fetching exit-node details, {cyan}retrying....{color()}{e_backoff}{fc.ENDC}")
+            sys.exit(
+                color()
+                + f"""\nUnable to get the network-details, try with -w once.
+if this persists, please raise an issue on github.\n\n{color(red)}{e}"""
+                + fc.ENDC
+            )
+        print(
+            f"{color(lightgreen)}\nhaving trouble fetching exit-node details, {cyan}retrying....{color()}{e_backoff}{fc.ENDC}"
+        )
         time.sleep(1.2)
         return tor_stat(e_backoff)
 
-    status = re.search(r'<title[^>]*>([^<]+)</title>', resp.text).group(1)
-    ip = re.search( r'[0-9]+(?:\.[0-9]+){3}', resp.text ).group(0)
-        
+    status = re.search(r"<title[^>]*>([^<]+)</title>", resp.text).group(1)
+    ip = re.search(r"[0-9]+(?:\.[0-9]+){3}", resp.text).group(0)
+
     print("\nYour Ip address is: " + color() + fc.BOLD + ip + fc.ENDC)
-    print(f"{color()}Congratulations, you're using tor :){fc.ENDC}") if "Congratulations" in status.strip() else print(f"{color()}{status.strip()}{fc.ENDC}")
+    (
+        print(f"{color()}Congratulations, you're using tor :){fc.ENDC}")
+        if "Congratulations" in status.strip()
+        else print(f"{color()}{status.strip()}{fc.ENDC}")
+    )
     return 0
 
-def check_default_rules(shell:bool = True):
-    return subprocess.Popen(r"iptables-save | grep '^\-' | wc -l", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell).communicate()
+
+def check_default_rules(shell: bool = True):
+    return subprocess.Popen(
+        r"iptables-save | grep '^\-' | wc -l",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=shell,
+    ).communicate()
 
 
 def firewall():
@@ -328,20 +422,31 @@ def firewall():
     print(f"{green}Backing up Iptables..{fc.ENDC}")
     firewall_green, firewall_red = check_default_rules()
     if firewall_red:
-        print(f"{red}\nCan't execute {blue}iptables-save{fc.ENDC}. see the reson below.\n{red}{fc.BOLD}{firewall_red.decode('utf-8')}{fc.ENDC}")
+        print(
+            f"{red}\nCan't execute {blue}iptables-save{fc.ENDC}. see the reson below.\n{red}{fc.BOLD}{firewall_red.decode('utf-8')}{fc.ENDC}"
+        )
         sys.exit()
-    if firewall_green.strip() == b'0':
+    if firewall_green.strip() == b"0":
         print(f" {lightblue}default rules are configured, skipping..")
     else:
-        proc = subprocess.Popen('iptables-save > /etc/iptables_rules_neutron.bak', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        proc = subprocess.Popen(
+            "iptables-save > /etc/iptables_rules_neutron.bak",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True,
+        )
         outp, error = proc.communicate()
-        if error and b'Warning:' not in error: 
-            print(f"{red}\nCan't seem to save the iptables_bakup file in /etc.\n{error.decode('utf-8')}")
+        if error and b"Warning:" not in error:
+            print(
+                f"{red}\nCan't seem to save the iptables_bakup file in /etc.\n{error.decode('utf-8')}"
+            )
             sys.exit()
-        print(f"{lightred}Done :) {blue}location: {red}/etc/iptables_rules_neutron.bak{fc.ENDC}", end='\n') 
+        print(
+            f"{lightred}Done :) {blue}location: {red}/etc/iptables_rules_neutron.bak{fc.ENDC}",
+            end="\n",
+        )
 
-
-    inn_out_rules = '''
+    inn_out_rules = """
             
 ### Set variables
 # The UID that Tor runs as (varies from system to system)
@@ -444,55 +549,89 @@ iptables -P INPUT DROP
 iptables -P FORWARD DROP
 iptables -P OUTPUT DROP
 
-    '''
+    """
 
     print(f"{green}Cooking up firewall rules{fc.ENDC}")
-    process5 = subprocess.Popen('/bin/bash', stdin=subprocess.PIPE,
-                                stdout=open(os.devnull, 'wb'), stderr=subprocess.PIPE)
-    out5, err5 = process5.communicate(inn_out_rules.encode('utf-8'))
-
+    process5 = subprocess.Popen(
+        "/bin/bash",
+        stdin=subprocess.PIPE,
+        stdout=open(os.devnull, "wb"),
+        stderr=subprocess.PIPE,
+    )
+    out5, err5 = process5.communicate(inn_out_rules.encode("utf-8"))
 
     if err5:
-        print('\n' + color() + err5.decode('utf8').strip() + fc.ENDC)
-        print("""There's something strange with your system
-It doesn't let me change the iptable rules""")
+        print("\n" + color() + err5.decode("utf8").strip() + fc.ENDC)
+        print(
+            """There's something strange with your system
+It doesn't let me change the iptable rules"""
+        )
         sys.exit()
     time.sleep(1.2)
     print(color(lightred) + "DONE :)" + fc.ENDC)
 
 
-def reset_to_default(reset_trigger: int= 0, overide_pass: bool= False, reset_as_child_func:bool = False, nuke_sanity:bool = False):
+def reset_to_default(
+    reset_trigger: int = 0,
+    overide_pass: bool = False,
+    reset_as_child_func: bool = False,
+    nuke_sanity: bool = False,
+):
 
     if not overide_pass:
-        if reset_trigger >7: sys.exit(f"{red}exiting to prevent memory corruption.{fc.ENDC}")
-        reset_consent = input(f"{color()}\nThis will overwrite all of your existing rules {green}Y(do it){fc.ENDC}/{red}N(exit){fc.ENDC}: ").lower()
-        if reset_consent == 'y': pass
-        elif reset_consent == 'n': sys.exit(f"{red}Copy that..\n{fc.ENDC}")
+        if reset_trigger > 7:
+            sys.exit(f"{red}exiting to prevent memory corruption.{fc.ENDC}")
+        reset_consent = input(
+            f"{color()}\nThis will overwrite all of your existing rules {green}Y(do it){fc.ENDC}/{red}N(exit){fc.ENDC}: "
+        ).lower()
+        if reset_consent == "y":
+            pass
+        elif reset_consent == "n":
+            sys.exit(f"{red}Copy that..\n{fc.ENDC}")
         else:
             reset_trigger += 1
             return reset_to_default(reset_trigger=reset_trigger)
-        
+
         time.sleep(1)
-        print(f'{lightpurple}Backing up current rules, just in case..{fc.ENDC}')
-        
+        print(f"{lightpurple}Backing up current rules, just in case..{fc.ENDC}")
+
         default_check_green, default_check_red = check_default_rules()
         if default_check_red:
-            print(f"{red}Error while checking existing rules; {orange}exiting..\n{yellow}Error message: {color()}{default_check_red.decode('utf-8')}{fc.ENDC}")
+            print(
+                f"{red}Error while checking existing rules; {orange}exiting..\n{yellow}Error message: {color()}{default_check_red.decode('utf-8')}{fc.ENDC}"
+            )
             sys.exit()
-        if default_check_green.strip() != b'0': 
+        if default_check_green.strip() != b"0":
             file_name_id = time.strftime("%m_%d_%Y-%H:%M:%S", time.localtime())
-            proc = subprocess.Popen(f'sudo iptables-save > /tmp/iptables_{file_name_id}.rules', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            proc = subprocess.Popen(
+                f"sudo iptables-save > /tmp/iptables_{file_name_id}.rules",
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=True,
+            )
             outp, error = proc.communicate()
-            if error and b'Warning:' not in error: 
-                print(f"{red}\nCan't seem to save the iptables_bakup file in /tmp directory.\n{error.decode('utf-8')}")
+            if error and b"Warning:" not in error:
+                print(
+                    f"{red}\nCan't seem to save the iptables_bakup file in /tmp directory.\n{error.decode('utf-8')}"
+                )
                 sys.exit()
-            print(f"{lightcyan}Saved in {blue}/tmp{fc.ENDC} as {red}iptables_{file_name_id}.rules{fc.ENDC}", end='\n\n') 
+            print(
+                f"{lightcyan}Saved in {blue}/tmp{fc.ENDC} as {red}iptables_{file_name_id}.rules{fc.ENDC}",
+                end="\n\n",
+            )
         else:
-            print(f"{orange} Default rules are set, backup not required :){fc.ENDC}", end= "\n")
+            print(
+                f"{orange} Default rules are set, backup not required :){fc.ENDC}",
+                end="\n",
+            )
             nuke_sanity = True
-            
-        print(orange + fc.BOLD + 'Reseting Iptables' + fc.ENDC) if not nuke_sanity else print(f"{cyan}{fc.BOLD}I'm nuking everything just for sanity{fc.ENDC}")
-    iptables_rules = '''
+
+        (
+            print(orange + fc.BOLD + "Reseting Iptables" + fc.ENDC)
+            if not nuke_sanity
+            else print(f"{cyan}{fc.BOLD}I'm nuking everything just for sanity{fc.ENDC}")
+        )
+    iptables_rules = """
 
 # Accepting all traffic first#
 iptables -P INPUT ACCEPT
@@ -514,16 +653,20 @@ iptables -t mangle -F
 iptables -t mangle -X
 iptables -t raw -F
 iptables -t raw -X
-    '''
-    
+    """
+
     process = subprocess.Popen(
-        '/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = process.communicate(iptables_rules.encode('utf-8'))
+        "/bin/bash",
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    out, err = process.communicate(iptables_rules.encode("utf-8"))
 
     time.sleep(0.5)
     if err:
         print(color() + "Can't reset Iptables")
-        print(color() + '\n' + err.decode('utf8').strip() + fc.ENDC)
+        print(color() + "\n" + err.decode("utf8").strip() + fc.ENDC)
         sys.exit()
     if reset_as_child_func:
         pass
@@ -535,7 +678,7 @@ iptables -t raw -X
 
 def usage():
 
-    banner = """
+    banner = r"""
                             _ ._  _ , _ ._
                           (_ ' ( `  )_  .__)
                         ( (  (    )   `)  ) _)
@@ -560,38 +703,48 @@ def usage():
 
 
 arg = sys.argv[1:]
-args = {"proxy": ["--mask", "-m"], "surface":["--expose", "-e"], "identity":["--ip", "-i"], 
-        "scramble": ["--shuffle", "-s"], "cover": ['--whatami', '-w'], "revert_tables": ['--nuke', '-n'], "help": ["-h", "--help"]}
+args = {
+    "proxy": ["--mask", "-m"],
+    "surface": ["--expose", "-e"],
+    "identity": ["--ip", "-i"],
+    "scramble": ["--shuffle", "-s"],
+    "cover": ["--whatami", "-w"],
+    "revert_tables": ["--nuke", "-n"],
+    "help": ["-h", "--help"],
+}
 
 if len(arg) != 1:
-    print(f"{color()}I need one argument: like -m or -e\nplease, use -h/--help for more usage :)\n{fc.ENDC}")
-elif sys.argv[1].lower() in args['proxy']:
+    print(
+        f"{color()}I need one argument: like -m or -e\nplease, use -h/--help for more usage :)\n{fc.ENDC}"
+    )
+elif sys.argv[1].lower() in args["proxy"]:
     sudo()
     logo("sleep")
     configure()
     firewall()
     tor_stat(0)
-elif sys.argv[1].lower() in args['surface']:
+elif sys.argv[1].lower() in args["surface"]:
     sudo()
     logo("sleep")
     terminate()
-elif sys.argv[1].lower() in args['identity']:
+elif sys.argv[1].lower() in args["identity"]:
     logo()
-    print('\n' + green + 'your ip is: ' + fc.ENDC + color() + ip() + fc.ENDC)
-elif sys.argv[1].lower() in args['scramble']:
+    print("\n" + green + "your ip is: " + fc.ENDC + color() + ip() + fc.ENDC)
+elif sys.argv[1].lower() in args["scramble"]:
     sudo()
     logo("sleep")
     torcircuit()
-elif sys.argv[1].lower() in args['cover']:
+elif sys.argv[1].lower() in args["cover"]:
     logo()
     tor_stat(0)
-elif sys.argv[1].lower() in args['revert_tables']:
+elif sys.argv[1].lower() in args["revert_tables"]:
     sudo()
     logo("sleep")
     reset_to_default()
-elif sys.argv[1].lower() in args['help']:
+elif sys.argv[1].lower() in args["help"]:
     usage()
 else:
     print(
-        f"{color(lightgreen)} {sys.argv[1]}! {color(lightblue)}ain't a valid trigger. {fc.ENDC}")
+        f"{color(lightgreen)} {sys.argv[1]}! {color(lightblue)}ain't a valid trigger. {fc.ENDC}"
+    )
     usage()
