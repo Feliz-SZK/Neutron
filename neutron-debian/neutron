@@ -3,6 +3,7 @@
 import os
 import sys
 import time
+import shutil
 from signal import signal, SIGINT
 import random
 import requests
@@ -26,6 +27,8 @@ lightpurple = "\033[95m"
 
 
 color_taken = []
+RESOLV_CONF_PATH = "/etc/resolv.conf"
+TORRC_PATH = "/etc/tor/torrc"
 
 
 def color(*args):
@@ -148,7 +151,7 @@ def finesse(backoff, resolv_switch):
             f"\n{color(red)}excceeded no of retries, terminating to prevent memory corruption.{fc.ENDC}"
         )
 
-    if not os.path.exists("/etc/resolv.conf"):
+    if not os.path.exists(RESOLV_CONF_PATH):
         print(f"\n{color(lightblue)}resolv.conf file is missing,", end=" ")
         askin = (
             str(
@@ -162,7 +165,7 @@ def finesse(backoff, resolv_switch):
 
         if askin == "y":
             try:
-                with open("/etc/resolv.conf", "w") as f:
+                with open(RESOLV_CONF_PATH, "w") as f:
                     f.write("nameserver 127.0.0.1")
                 resolv_switch += 1
                 print(f"{color()}Done, saved with local dns.{fc.ENDC}")
@@ -192,14 +195,14 @@ resolvstring = "nameserver 127.0.0.1"
 
 def resolv_config(r_switch):
     if r_switch == 0:
-        with open("/etc/resolv.conf") as f:
+        with open(RESOLV_CONF_PATH) as f:
             lines = f.read().splitlines()
 
         if resolvstring not in lines:
             print(green + fc.BOLD + "Configuring resolv.conf" + fc.ENDC)
             time.sleep(0.4)
-            os.system("cp /etc/resolv.conf /etc/resolv.conf.backup_neutron")
-            with open("/etc/resolv.conf", "w") as rconf:
+            os.system(f"cp {RESOLV_CONF_PATH} {RESOLV_CONF_PATH}.backup_neutron")
+            with open(RESOLV_CONF_PATH, "w") as rconf:
                 rconf.write("%s\n" % resolvstring)
             print(color(lightred) + "DONE :)" + fc.ENDC)
         else:
@@ -210,8 +213,8 @@ def resolv_config(r_switch):
                 time.sleep(0.5)
             else:
                 print(green + fc.BOLD + "Configuring resolv.conf" + fc.ENDC)
-                os.system("cp /etc/resolv.conf /etc/resolv.conf.backup_neutron")
-                with open("/etc/resolv.conf", "w") as rconf:
+                os.system(f"cp {RESOLV_CONF_PATH} {RESOLV_CONF_PATH}.backup_neutron")
+                with open(RESOLV_CONF_PATH, "w") as rconf:
                     rconf.write("%s\n" % resolvstring)
                 print(color(lightred) + "Done...." + fc.ENDC)
     else:
@@ -229,14 +232,14 @@ def configure():
 
     r_switch = finesse(0, 0)
 
-    if os.system("which tor > /dev/null") == 0:
+    if shutil.which("tor"):
 
-        if not os.path.exists("/etc/tor/torrc"):
+        if not os.path.exists(TORRC_PATH):
             print(
                 f"{color(red)}No torrc file is configured.....{fc.ENDC}{color(green)}Configuring:)"
             )
             try:
-                f = open("/etc/tor/torrc", "w+")
+                f = open(TORRC_PATH, "w+")
                 for elements in torrstring:
                     f.write("%s\n" % elements)
                 f.close()
@@ -248,14 +251,14 @@ def configure():
             print(f"\n{color(green)}{fc.BOLD}Configuring Torrc {fc.ENDC}")
             time.sleep(0.4)
 
-            with open("/etc/tor/torrc") as x:
+            with open(TORRC_PATH) as x:
                 verse = x.read().splitlines()
 
             subprocess.Popen(
-                ["cp", "/etc/tor/torrc", "/etc/tor/torrc.bak_neutron"],
+                ["cp", TORRC_PATH, f"{TORRC_PATH}.bak_neutron"],
                 stdout=subprocess.PIPE,
             ).communicate()
-            torrc = open("/etc/tor/torrc", "w")
+            torrc = open(TORRC_PATH, "w")
             for elements in torrstring:
                 torrc.write("%s\n" % elements)
             torrc.close()
@@ -276,9 +279,9 @@ def configure():
 def terminate():
 
     trigger = 0
-    if os.path.exists("/etc/resolv.conf.backup_neutron"):
+    if os.path.exists(f"{RESOLV_CONF_PATH}.backup_neutron"):
         trigger += 1
-        restore = "yes | mv /etc/resolv.conf.backup_neutron /etc/resolv.conf"
+        restore = f"yes | mv {RESOLV_CONF_PATH}.backup_neutron {RESOLV_CONF_PATH}"
         process = subprocess.Popen(
             "/bin/bash",
             stdin=subprocess.PIPE,
@@ -300,9 +303,9 @@ else your system has some serious paranoia; deleting backups itself."""
         time.sleep(0.5)
         print(f"{cyan}{fc.BOLD}[Complete]{fc.ENDC}")
 
-    if os.path.exists("/etc/tor/torrc.bak_neutron"):
+    if os.path.exists(f"{TORRC_PATH}.bak_neutron"):
         trigger += 1
-        torrc_restore = "mv /etc/tor/torrc.bak_neutron /etc/tor/torrc"
+        torrc_restore = f"mv {TORRC_PATH}.bak_neutron {TORRC_PATH}"
         process = subprocess.Popen(
             "/bin/bash",
             stdin=subprocess.PIPE,
