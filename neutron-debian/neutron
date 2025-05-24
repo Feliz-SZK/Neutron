@@ -108,25 +108,26 @@ _  /|  / /  __/ /_/ // /_ _  /   / /_/ /  / / /
 
 
 def ip():
-    try:
-        ip_ = requests.get("https://icanhazip.com/").text
-    except requests.exceptions.RequestException:
+    endpoints = ["https://icanhazip.com/", "https://ipinfo.io/ip"]
+    last_error = None
+
+    for endpoint in endpoints:
         try:
-            ip1 = requests.get("https://ipinfo.io/ip").text
-            return ip1
+            return requests.get(endpoint, timeout=8).text.strip()
         except requests.exceptions.RequestException as e:
-            print(f"\n{e}")
-            sys.exit(
-                color()
-                + """\nSorry, can't fetch the deets.
+            last_error = e
+
+    # All endpoints failed
+    print(f"\n{last_error}")
+    sys.exit(
+        color()
+        + """\nSorry, can't fetch the deets.
 Either the site's down or something's up with your internet-config.
 
 you may found the solution here :)
 https://github.com/Feliz-SZK/Linux-Decoded/blob/master/Fix%20temporary%20failure%20in%20name%20resolution.md"""
-                + fc.ENDC
-            )
-
-    return ip_
+        + fc.ENDC
+    )
 
 
 def frag():
@@ -708,44 +709,33 @@ args = {
     "surface": ["--expose", "-e"],
     "identity": ["--ip", "-i"],
     "scramble": ["--shuffle", "-s"],
-    "cover": ["--whatami", "-w"],
+    "check_cover": ["--whatami", "-w"],
     "revert_tables": ["--nuke", "-n"],
     "help": ["-h", "--help"],
 }
 
+# dispatch table - functions executed in sequence
+dispatch = {
+    "proxy": [sudo, lambda: logo("sleep"), configure, firewall, lambda: tor_stat(0)],
+    "surface": [sudo, lambda: logo("sleep"), terminate],
+    "identity": [logo, lambda: print("\n" + green + "your ip is: " + fc.ENDC + color() + ip() + fc.ENDC)],
+    "scramble": [sudo, lambda: logo("sleep"), torcircuit],
+    "check_cover": [logo, lambda: tor_stat(0)],
+    "revert_tables": [sudo, lambda: logo("sleep"), reset_to_default],
+    "help": [usage],
+}
 
+# Functional helpers
+find_action = lambda argument: next((key for key, flags in args.items() if argument.lower() in flags), None)
+execute_pipeline = lambda functions: [func() for func in functions]
+
+# Main execution - clean and compact
 if len(arg) != 1:
-    print(
-        f"{color()}I need one argument: like -m or -e\nplease, use -h/--help for more usage :)\n{fc.ENDC}"
-    )
-elif sys.argv[1].lower() in args["proxy"]:
-    sudo()
-    logo("sleep")
-    configure()
-    firewall()
-    tor_stat(0)
-elif sys.argv[1].lower() in args["surface"]:
-    sudo()
-    logo("sleep")
-    terminate()
-elif sys.argv[1].lower() in args["identity"]:
-    logo()
-    print("\n" + green + "your ip is: " + fc.ENDC + color() + ip() + fc.ENDC)
-elif sys.argv[1].lower() in args["scramble"]:
-    sudo()
-    logo("sleep")
-    torcircuit()
-elif sys.argv[1].lower() in args["cover"]:
-    logo()
-    tor_stat(0)
-elif sys.argv[1].lower() in args["revert_tables"]:
-    sudo()
-    logo("sleep")
-    reset_to_default()
-elif sys.argv[1].lower() in args["help"]:
-    usage()
+    print(f"{color()}I need one argument: like -m or -e\nplease, use -h/--help for more usage :)\n{fc.ENDC}")
 else:
-    print(
-        f"{color(lightgreen)} {sys.argv[1]}! {color(lightblue)}ain't a valid trigger. {fc.ENDC}"
-    )
-    usage()
+    action = find_action(sys.argv[1])
+    if action and action in dispatch:
+        execute_pipeline(dispatch[action])
+    else:
+        print(f"{color(lightgreen)} {sys.argv[1]}! {color(lightblue)}ain't a valid trigger. {fc.ENDC}")
+        usage()
