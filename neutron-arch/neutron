@@ -4,7 +4,7 @@ import os
 import sys
 import time
 import shutil
-from signal import signal, SIGINT
+from signal import signal, SIGINT, SIGTERM
 import random
 import requests
 import subprocess
@@ -55,15 +55,6 @@ def sudo():
             + "I'm affraid I need some superuser privilages, start with 'sudo'"
             + fc.ENDC
         )
-
-
-def handler(signal_received, frame):
-    print(color() + fc.BOLD + "\nCTRL-C detected. Exiting.... ")
-    exit(0)
-
-
-if __name__ == "__main__":
-    signal(SIGINT, handler)
 
 
 def logo(*args):
@@ -712,18 +703,18 @@ args = {
     "surface": ["--expose", "-e"],
     "identity": ["--ip", "-i"],
     "scramble": ["--shuffle", "-s"],
-    "cover": ["--whatami", "-w"],
+    "check_cover": ["--whatami", "-w"],
     "revert_tables": ["--nuke", "-n"],
     "help": ["-h", "--help"],
 }
 
-# Elegant dispatch table - functions executed in sequence
+# functions executed in sequence
 dispatch = {
     "proxy": [sudo, lambda: logo("sleep"), configure, firewall, lambda: tor_stat(0)],
     "surface": [sudo, lambda: logo("sleep"), terminate],
     "identity": [logo, lambda: print("\n" + green + "your ip is: " + fc.ENDC + color() + ip() + fc.ENDC)],
     "scramble": [sudo, lambda: logo("sleep"), torcircuit],
-    "cover": [logo, lambda: tor_stat(0)],
+    "check_cover": [logo, lambda: tor_stat(0)],
     "revert_tables": [sudo, lambda: logo("sleep"), reset_to_default],
     "help": [usage],
 }
@@ -732,13 +723,24 @@ dispatch = {
 find_action = lambda argument: next((key for key, flags in args.items() if argument.lower() in flags), None)
 execute_pipeline = lambda functions: [func() for func in functions]
 
-# Main execution - clean and compact
-if len(arg) != 1:
-    print(f"{color()}I need one argument: like -m or -e\nplease, use -h/--help for more usage :)\n{fc.ENDC}")
-else:
+
+def main() -> None:
+    """Main application entry point"""
+    arg = sys.argv[1:]
+
+    if len(arg) != 1:
+        print(f"{color()}I need one argument: like -m or -e\nplease, use -h/--help for more usage :)\n{fc.ENDC}")
+        return
+
     action = find_action(sys.argv[1])
     if action and action in dispatch:
         execute_pipeline(dispatch[action])
     else:
         print(f"{color(lightgreen)} {sys.argv[1]}! {color(lightblue)}ain't a valid trigger. {fc.ENDC}")
         usage()
+
+
+if __name__ == "__main__":
+    [signal(sig, lambda s, f: (print(color() + fc.BOLD + "\nCTRL-C detected. Exiting.... "), exit(0)))
+         for sig in [SIGINT, SIGTERM]]
+    main()
